@@ -1702,7 +1702,7 @@ class PlayState extends MusicBeatState
 		
 		if (generatedMusic && !endingSong && !isCameraOnForcedPos) moveCameraSection();
 
-		if (updateCamOffsets) updateCameraOffsets(camCurTarget);
+		if (updateCamOffsets && camCurTarget != gf) updateCameraOffsets(camCurTarget);
 
 		FlxG.camera.targetOffset.set(camFollowOffset.x, camFollowOffset.y);
 		
@@ -2591,9 +2591,12 @@ class PlayState extends MusicBeatState
 		else
 		{
 			camTwn[0] = FlxTween.tween(FlxG.camera, {zoom: targetZoom}, Conductor.stepCrotchet * duration / 1000, {ease: CoolUtil.getEaseFromString(ease), 
-				onComplete: function(twn:FlxTween)
+				onUpdate: function(twn:FlxTween)
 				{
 					defaultCamZoom = FlxG.camera.zoom;
+				},
+				onComplete: function(twn:FlxTween)
+				{
 					camTwn[0] = null;
 				}
 			});
