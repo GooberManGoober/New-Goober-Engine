@@ -54,16 +54,18 @@ class Init extends FlxState
 		
 		FlxG.autoPause = ClientPrefs.autoPause;
 		
+		funkin.scripts.FunkinScript.init();
+		
 		// ready backends
 		funkin.backend.plugins.HotReloadPlugin.init();
+		
+		funkin.backend.plugins.ModPlugin.init();
 		
 		funkin.backend.plugins.DebugTextPlugin.init();
 		
 		funkin.backend.plugins.FullScreenPlugin.init();
 
 		funkin.backend.plugins.ScreenshotPlugin.initialize();
-		
-		funkin.scripts.FunkinScript.init();
 		
 		#if VIDEOS_ALLOWED
 		funkin.video.FunkinVideoSprite.init();
@@ -73,8 +75,10 @@ class Init extends FlxState
 		funkin.utils.WindowUtil.initTracy();
 		#end
 		
-		funkin.scripting.PluginsManager.prepareSignals();
-		funkin.scripting.PluginsManager.populate();
+		funkin.backend.plugins.ModPlugin.instance.populate();
+		
+		// funkin.scripting.PluginsManager.prepareSignals();
+		// funkin.scripting.PluginsManager.populate();
 		
 		FunkinAssets.cache.currentTrackedSounds.addPermanentKey('assets/music/freakyMenu.ogg');
 		
