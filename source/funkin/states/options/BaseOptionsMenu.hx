@@ -65,7 +65,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 		descBox.alpha = 0.6;
 		add(descBox);
 		
-		titleText = new Alphabet(0, 0, title, true, false, 0, 0.6);
+		titleText = new Alphabet(0, 0, title, true, 0.6);
 		titleText.x += 60;
 		titleText.y += 40;
 		titleText.alpha = 0.4;
@@ -79,7 +79,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 		
 		for (i in 0...optionsArray.length)
 		{
-			var optionText:Alphabet = new Alphabet(0, 70 * i, optionsArray[i].name, false, false);
+			var optionText:Alphabet = new Alphabet(0, 70 * i, optionsArray[i].name, false);
 			optionText.isMenuItem = true;
 			optionText.x += 125;
 			/*optionText.forceX = 300;

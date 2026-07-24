@@ -134,7 +134,7 @@ class CreditsState extends MusicBeatState
 		
 		for (i in 0...credits.length)
 		{
-			var optionText:Alphabet = new Alphabet(0, 70 * i, credits[i].name, credits[i].isTitle, false);
+			var optionText:Alphabet = new Alphabet(0, 70 * i, credits[i].name, credits[i].isTitle);
 			optionText.isMenuItem = true;
 			optionText.screenCenter(X);
 			optionText.yAdd -= 70;

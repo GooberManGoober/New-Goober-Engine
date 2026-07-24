@@ -4003,7 +4003,7 @@ class ChartingOptionsSubmenuOLD extends MusicBeatSubstate
 		add(grpMenuShit);
 		for (i in 0...menuItems.length)
 		{
-			var item = new Alphabet(0, 70 * i, menuItems[i], true, false);
+			var item = new Alphabet(0, 70 * i, menuItems[i], true);
 			item.isMenuItem = true;
 			item.targetY = i;
 			item.scrollFactor.set();

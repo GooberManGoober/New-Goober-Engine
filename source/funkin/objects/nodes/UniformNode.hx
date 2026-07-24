@@ -11,7 +11,6 @@ import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
  * Note: Visibility must be handled via the module.
  * Use case:
  * ```haxe
- * // secondSprite will follow the position of the mainSprite
  * var mainSprite = new FlxSprite();
  * add(mainSprite);
  * 
