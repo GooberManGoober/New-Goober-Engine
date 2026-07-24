@@ -10,11 +10,18 @@ import funkin.input.Controls;
 @:nullSafety
 class FullScreenPlugin extends FlxBasic
 {
-	static var instance:Null<FullScreenPlugin> = null;
+	@:nullSafety(Off)
+	static var instance:FullScreenPlugin;
 	
 	public static function init()
 	{
-		if (instance == null) FlxG.plugins.addPlugin(instance = new FullScreenPlugin());
+		if (instance == null)
+		{
+			FlxG.plugins.addPlugin(instance = new FullScreenPlugin());
+			#if debug
+			FlxG.console.registerClass(FullScreenPlugin);
+			#end
+		}
 	}
 	
 	public function new()

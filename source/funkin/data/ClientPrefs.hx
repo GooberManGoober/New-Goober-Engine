@@ -64,8 +64,6 @@ class ClientPrefs
 	@saveVar public static var vsyncMode:VsyncMode = OFF;
 	
 	// visuals ------------------------------------------------------------------------//
-	@saveVar public static var jumpGhosts:Bool = false;
-	
 	@saveVar public static var noteSplashType:String = 'Both';
 	
 	@saveVar public static var hideHud:Bool = false;
