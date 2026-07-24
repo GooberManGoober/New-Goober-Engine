@@ -11,6 +11,7 @@ import flixel.FlxSprite;
 import funkin.objects.*;
 import funkin.backend.MusicBeatSubstate;
 import funkin.objects.Character;
+import funkin.objects.nodes.AttachedNode;
 
 class BaseOptionsMenu extends MusicBeatSubstate
 {
@@ -103,7 +104,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 				valueText.ID = i;
 				grpTexts.add(valueText);
 				
-				var attach = new AttachedModule(valueText, optionText);
+				var attach = new AttachedNode(valueText, optionText);
 				add(attach);
 				attach.positionOffset.x = optionText.width + 80;
 				

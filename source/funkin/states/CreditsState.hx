@@ -1,6 +1,6 @@
 package funkin.states;
 
-import funkin.objects.AttachedModule;
+import funkin.objects.nodes.AttachedNode;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -156,7 +156,7 @@ class CreditsState extends MusicBeatState
 			icon.visible = Paths.fileExists('images/branding/credits/${credits[i].iconPath}.png');
 			add(icon);
 			
-			var iconAttacher = new AttachedModule(icon, optionText);
+			var iconAttacher = new AttachedNode(icon, optionText);
 			iconAttacher.copyVisibility = false;
 			iconAttacher.positionOffset.x = optionText.width + 10;
 			add(iconAttacher);
@@ -171,15 +171,15 @@ class CreditsState extends MusicBeatState
 		}
 		
 		descBox = cast new AttachedSprite().makeGraphic(1, 1, FlxColor.BLACK);
-		descBox.attachedModule.positionOffset.set(-10, -10);
-		descBox.attachedModule.alphaMultiplier = 0.6;
+		descBox.attachedNode.positionOffset.set(-10, -10);
+		descBox.attachedNode.alphaMultiplier = 0.6;
 		descBox.alpha = 0.6;
 		add(descBox);
 		
 		descText = new FlxText(50, FlxG.height + descYOffset - 25, 1180, "", 32);
 		descText.setFormat(Paths.DEFAULT_FONT, 32, FlxColor.WHITE, CENTER);
 		descText.scrollFactor.set();
-		descBox.attachedModule.tracked = descText;
+		descBox.attachedNode.tracked = descText;
 		add(descText);
 		
 		changeSelection();

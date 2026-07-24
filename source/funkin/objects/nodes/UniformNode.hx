@@ -1,4 +1,4 @@
-package funkin.objects;
+package funkin.objects.nodes;
 
 import flixel.math.FlxRect;
 import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
@@ -15,11 +15,11 @@ import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
  * var mainSprite = new FlxSprite();
  * add(mainSprite);
  * 
- * var attachedModule = new FlxUniformModule(mainSprite);
- * add(attachedModule);
+ * var uniformModule = new UniformNode(mainSprite);
+ * add(uniformModule);
  * ```
  */
-class FlxUniformModule extends FlxBasic
+class UniformNode extends FlxBasic
 {
 	public var root:Null<FlxSprite> = null;
 	

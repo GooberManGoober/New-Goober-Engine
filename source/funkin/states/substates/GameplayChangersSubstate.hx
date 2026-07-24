@@ -1,6 +1,6 @@
 package funkin.states.substates;
 
-import funkin.objects.AttachedModule;
+import funkin.objects.nodes.AttachedNode;
 import funkin.objects.CheckboxThingie;
 import funkin.objects.Alphabet;
 
@@ -130,7 +130,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 				valueText.isMenuItem = false;
 				valueText.ID = i;
 				
-				var attach = new AttachedModule(valueText, optionText);
+				var attach = new AttachedNode(valueText, optionText);
 				add(attach);
 				attach.positionOffset.x = optionText.width + 80;
 				

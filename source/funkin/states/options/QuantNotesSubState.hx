@@ -12,6 +12,7 @@ import funkin.objects.*;
 import funkin.states.substates.*;
 import funkin.game.shaders.*;
 import funkin.backend.MusicBeatSubstate;
+import funkin.objects.nodes.AttachedNode;
 
 class QuantNotesSubState extends MusicBeatSubstate
 {
@@ -99,7 +100,7 @@ class QuantNotesSubState extends MusicBeatSubstate
 			txt.isMenuItem = false;
 			add(txt);
 			
-			var attach = new AttachedModule(txt, note);
+			var attach = new AttachedNode(txt, note);
 			add(attach);
 			
 			var animations:Array<String> = ['purple0', 'blue0', 'green0', 'red0'];
