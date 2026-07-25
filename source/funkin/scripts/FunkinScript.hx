@@ -228,6 +228,7 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		set('ObjectMap', haxe.ds.ObjectMap);
 		
 		set("Main", Main);
+		set("Lib", openfl.Lib);
 		set("Assets", lime.utils.Assets);
 		set("OpenFlAssets", openfl.utils.Assets);
 		
