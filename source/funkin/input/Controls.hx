@@ -167,12 +167,6 @@ class Controls extends FlxActionSet
 
 	var _fullscreen = new FlxActionDigital(Action.FULLSCREEN);
 	var _screenshot = new FlxActionDigital(Action.SCREENSHOT);
-	var _display = new FlxActionDigital(Action.DISPLAY);
-
-	var _softreload = new FlxActionDigital(Action.SOFTRELOAD);
-	var _hardreload = new FlxActionDigital(Action.HARDRELOAD);
-	
-	var _fullscreen = new FlxActionDigital(Action.FULLSCREEN);
 	var _switch_debug_display = new FlxActionDigital(Action.SWITCH_DEBUG_DISPLAY);
 	
 	var _soft_reload = new FlxActionDigital(Action.SOFT_RELOAD);
@@ -316,22 +310,6 @@ class Controls extends FlxActionSet
 	
 	inline function get_SCREENSHOT() return _screenshot.check();
 
-	public var DISPLAY(get, never):Bool;
-	
-	inline function get_DISPLAY() return _display.check();
-
-	public var SOFTRELOAD(get, never):Bool;
-	
-	inline function get_SOFTRELOAD() return _softreload.check();
-
-	public var HARDRELOAD(get, never):Bool;
-	
-	inline function get_HARDRELOAD() return _hardreload.check();
-	
-	public var FULLSCREEN(get, never):Bool;
-	
-	inline function get_FULLSCREEN() return _fullscreen.check();
-	
 	public var SWITCH_DEBUG_DISPLAY(get, never):Bool;
 	
 	inline function get_SWITCH_DEBUG_DISPLAY() return _switch_debug_display.check();
@@ -674,12 +652,6 @@ class Controls extends FlxActionSet
 
 				inline bindKeys(Control.FULLSCREEN, keysMap.get('fullscreen'));
 				inline bindKeys(Control.SCREENSHOT, keysMap.get('screenshot'));
-				inline bindKeys(Control.DISPLAY, keysMap.get('display'));
-
-				inline bindKeys(Control.SOFTRELOAD, keysMap.get('softreload'));
-				inline bindKeys(Control.HARDRELOAD, keysMap.get('hardreload'));
-				
-				inline bindKeys(Control.FULLSCREEN, keysMap.get('fullscreen'));
 				inline bindKeys(Control.SWITCH_DEBUG_DISPLAY, keysMap.get('switch_debug_display'));
 				
 				inline bindKeys(Control.SOFT_RELOAD, keysMap.get('soft_reload'));

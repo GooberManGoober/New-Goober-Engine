@@ -482,11 +482,6 @@ typedef CharacterInfo =
 	var ?ghosts_enabled:Bool;
 	
 	/**
-	 * If the character should show a ghost on double notes
-	 */
-	var ?ghosts_enabled:Bool;
-	
-	/**
 	 * How many beats between the characters `dance`
 	 */
 	var ?dance_every:Int;

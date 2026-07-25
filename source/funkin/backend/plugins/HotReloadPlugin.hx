@@ -43,12 +43,6 @@ class HotReloadPlugin extends FlxBasic
 		if (!ClientPrefs.inDevMode) return;
 		#end
 
-		if (Controls.instance.DISPLAY)
-		{
-			final fpsTypeArray:Array<String> = ['Simple', 'Advanced', 'Disabled'];
-			ClientPrefs.fpsDisplayType = fpsTypeArray[FlxMath.wrap(fpsTypeArray.indexOf(ClientPrefs.fpsDisplayType) + 1, 0, fpsTypeArray.length - 1)];
-		}
-		
 		if (Controls.instance.SOFT_RELOAD)
 		{
 			FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;

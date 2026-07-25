@@ -2772,6 +2772,7 @@ class PlayState extends MusicBeatState
 	 */
 	function snapCamToPos(x:Float = 0, y:Float = 0, lockPosition:Bool = false):Void
 	{
+		if (camFollowTween != null) camFollowTween.cancel();
 		camFollowPoint.set(x, y);
 		// camFollow.setPosition(x, y);
 		// FlxG.camera.snapToTarget();
