@@ -475,6 +475,11 @@ typedef CharacterInfo =
 	 * If the character should hold the last frame during a sing pose
 	 */
 	var ?vslice_sustains:Bool;
+
+	/**
+	 * If the character should show a ghost on double notes
+	 */
+	var ?ghosts_enabled:Bool;
 	
 	/**
 	 * If the character should show a ghost on double notes

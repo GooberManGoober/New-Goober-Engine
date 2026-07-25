@@ -425,6 +425,10 @@ class CharacterEditorState extends UIState // MUST EXTEND UI STATE needed for ac
 		uiElements.characterDialogBox.vSliceSusCheckbox.onChange = (ui) -> {
 			character.vSliceSustains = ui.value.toBool();
 		}
+
+		uiElements.characterDialogBox.ghostEnabledCheckbox.onChange = (ui) -> {
+			character.ghostsEnabled = ui.value.toBool();
+		}
 		
 		uiElements.characterDialogBox.ghostEnabledCheckbox.onChange = (ui) -> {
 			character.ghostsEnabled = ui.value.toBool();

@@ -49,7 +49,7 @@ class HotReloadPlugin extends FlxBasic
 			ClientPrefs.fpsDisplayType = fpsTypeArray[FlxMath.wrap(fpsTypeArray.indexOf(ClientPrefs.fpsDisplayType) + 1, 0, fpsTypeArray.length - 1)];
 		}
 		
-		if (Controls.instance.SOFTRELOAD)
+		if (Controls.instance.SOFT_RELOAD)
 		{
 			FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;
 			FlxG.resetState();
@@ -57,7 +57,7 @@ class HotReloadPlugin extends FlxBasic
 			Mods.applyModConfig();
 		}
 		
-		if (Controls.instance.HARDRELOAD)
+		if (Controls.instance.HARD_RELOAD)
 		{
 			FlxG.signals.preStateCreate.addOnce((state) -> {
 				FunkinAssets.cache.clearStoredMemory();

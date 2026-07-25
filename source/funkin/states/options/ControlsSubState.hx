@@ -84,9 +84,9 @@ class ControlsSubState extends MusicBeatSubstate
 		DEBUG_GROUP = [
 			{label: "Chart", action: "debug_1"},
 			{label: "Char", action: "debug_2"},
-			{label: "Display", action: DISPLAY},
-			{label: "Softreload", action: SOFTRELOAD},
-			{label: "Hardreload", action: HARDRELOAD},
+			{label: "Debug Display", action: SWITCH_DEBUG_DISPLAY},
+			{label: "Soft Reload", action: SOFT_RELOAD},
+			{label: "Hard Reload", action: HARD_RELOAD},
 			null,
 		];
 	}
@@ -459,7 +459,6 @@ class ControlsOption extends FlxSpriteContainer
 		super(x, y);
 		this.label = new Alphabet(0, 0, label, true);
 		add(this.label);
-		
 		binds = new FlxTypedSpriteContainer<Alphabet>(700, -55);
 		add(binds);
 		

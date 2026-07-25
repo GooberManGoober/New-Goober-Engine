@@ -222,9 +222,9 @@ class ClientPrefs
 		'volume_down' => [NUMPADMINUS, MINUS],
 		'debug_1' => [SEVEN, NONE],
 		'debug_2' => [EIGHT, NONE],
-		'softreload' => [F5, NONE],
-		'hardreload' => [F6, NONE],
-		'display' => [F3, NONE]
+		'soft_reload' => [F5, NONE],
+		'hard_reload' => [F6, NONE],
+		'switch_debug_display' => [F3, NONE]
 	];
 	
 	public static var defaultKeys:Map<Action, Array<FlxKey>> = null;
