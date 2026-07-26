@@ -1698,12 +1698,12 @@ class PlayState extends MusicBeatState
 	
 	override public function update(elapsed:Float):Void
 	{
-		final lerpRate = 1.0 * cameraSpeed * playbackRate;
+		// final lerpRate = 1.0 * cameraSpeed * playbackRate;
 		// FlxG.camera.followLerp = lerpRate;
 		
 		if (generatedMusic && !endingSong && !isCameraOnForcedPos) moveCameraSection();
 
-		if (updateCamOffsets && camCurTarget != gf) updateCameraOffsets(camCurTarget);
+		if (updateCamOffsets) updateCameraOffsets(camCurTarget);
 
 		camFollow.setPosition(camFollowPoint.x + camFollowOffset.x, camFollowPoint.y + camFollowOffset.y);
 		
@@ -2289,7 +2289,7 @@ class PlayState extends MusicBeatState
 					camFollowTween = FlxTween.tween(camFollowPoint, {
 						x: val1,
 						y: val2
-					}, 1.9, {ease: FlxEase.expoOut, onComplete: function(twn:FlxTween) {
+					}, 1.9 / (cameraSpeed * playbackRate), {ease: FlxEase.expoOut, onComplete: function(twn:FlxTween) {
 							camFollowTween = null;
 						}
 					});
@@ -2547,7 +2547,7 @@ class PlayState extends MusicBeatState
 					camTwn[1] = FlxTween.tween(camFollowPoint, {
 						x: positionData.x,
 						y: positionData.y
-					}, 1.9, {ease: FlxEase.expoOut, onComplete: function(twn:FlxTween) {
+					}, 1.9 / (cameraSpeed * playbackRate), {ease: FlxEase.expoOut, onComplete: function(twn:FlxTween) {
 							camTwn[1] = null;
 						}
 					});
@@ -2636,7 +2636,7 @@ class PlayState extends MusicBeatState
 			camFollowTween = FlxTween.tween(camFollowPoint, {
 				x: gf.getMidpoint().x + (gf.cameraPosition[0] + girlfriendCameraOffset[0]),
 				y: gf.getMidpoint().y + (gf.cameraPosition[1] + girlfriendCameraOffset[1])
-			}, 1.9, {ease: FlxEase.expoOut, onComplete: function(twn:FlxTween) {
+			}, 1.9 / (cameraSpeed * playbackRate), {ease: FlxEase.expoOut, onComplete: function(twn:FlxTween) {
 					camFollowTween = null;
 				}
 			});
@@ -2651,7 +2651,7 @@ class PlayState extends MusicBeatState
 				camFollowOffsetTween = FlxTween.tween(camFollowOffset, {
 					x: displacement.x,
 					y: displacement.y
-				}, 1.4, {ease: FlxEase.expoOut, onComplete: function(twn:FlxTween) {
+				}, 1.4 / (cameraSpeed * playbackRate), {ease: FlxEase.expoOut, onComplete: function(twn:FlxTween) {
 						camFollowOffsetTween = null;
 					}
 				});
@@ -2735,7 +2735,7 @@ class PlayState extends MusicBeatState
 		camFollowTween = FlxTween.tween(camFollowPoint, {
 			x: desiredPos.x,
 			y: desiredPos.y
-		}, 1.9, {ease: FlxEase.expoOut, onComplete: function(twn:FlxTween) {
+		}, 1.9 / (cameraSpeed * playbackRate), {ease: FlxEase.expoOut, onComplete: function(twn:FlxTween) {
 				camFollowTween = null;
 			}
 		});
@@ -2757,7 +2757,7 @@ class PlayState extends MusicBeatState
 			camFollowOffsetTween = FlxTween.tween(camFollowOffset, {
 				x: displacement.x,
 				y: displacement.y
-			}, 1.4, {ease: FlxEase.expoOut, onComplete: function(twn:FlxTween) {
+			}, 1.4 / (cameraSpeed * playbackRate), {ease: FlxEase.expoOut, onComplete: function(twn:FlxTween) {
 					camFollowOffsetTween = null;
 				}
 			});
