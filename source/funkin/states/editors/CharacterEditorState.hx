@@ -430,10 +430,6 @@ class CharacterEditorState extends UIState // MUST EXTEND UI STATE needed for ac
 			character.ghostsEnabled = ui.value.toBool();
 		}
 		
-		uiElements.characterDialogBox.ghostEnabledCheckbox.onChange = (ui) -> {
-			character.ghostsEnabled = ui.value.toBool();
-		}
-		
 		uiElements.characterDialogBox.antialiasingCheckbox.onChange = (ui) -> {
 			character.noAntialiasing = !ui.value.toBool();
 			character.antialiasing = !character.noAntialiasing;
