@@ -3,27 +3,25 @@ package funkin.scripting;
 import funkin.backend.FallbackState;
 
 @:nullSafety
-class ScriptedSubstate extends funkin.backend.MusicBeatSubstate
+class ScriptedSubState extends funkin.backend.MusicBeatSubState
 {
 	public function new(scriptName:String)
 	{
 		super();
 		
-		initStateScript(scriptName, false);
-		scriptGroup.parent = this;
-		scriptGroup.call('onLoad');
+		initStateScript(scriptName);
 	}
 	
 	override function create()
 	{
 		super.create();
 		
-		if (!scripted)
+		if (stateScripts.length == 0)
 		{
 			FlxG.switchState(() -> new FallbackState('failed to load ($scriptName)!\nDoes it exist?', () -> FlxG.switchState(MainMenuState.new)));
 			return;
 		}
 		
-		scriptGroup.call('onCreate');
+		stateScripts.call('onCreate');
 	}
 }

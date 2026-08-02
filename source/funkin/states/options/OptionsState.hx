@@ -28,7 +28,7 @@ class OptionsState extends MusicBeatState
 	
 	var justLeftSubState = false;
 	
-	public function openSelectedSubstate(label:String)
+	public function openSelectedSubState(label:String)
 	{
 		switch (label)
 		{
@@ -65,7 +65,7 @@ class OptionsState extends MusicBeatState
 		bg.screenCenter();
 		add(bg);
 		
-		scriptGroup.set('bg', bg);
+		stateScripts.set('bg', bg);
 		
 		grpOptions = new FlxTypedGroup<Alphabet>();
 		add(grpOptions);
@@ -87,7 +87,7 @@ class OptionsState extends MusicBeatState
 		
 		super.create();
 		
-		scriptGroup.call('onCreate', []);
+		stateScripts.call('onCreate');
 	}
 	
 	override function closeSubState()
@@ -124,10 +124,10 @@ class OptionsState extends MusicBeatState
 		
 		if (controls.ACCEPT)
 		{
-			openSelectedSubstate(options[curSelected]);
+			openSelectedSubState(options[curSelected]);
 		}
 		
-		scriptGroup.call('onUpdatePost', [elapsed]);
+		stateScripts.event('onUpdatePost', EventCache.get(UpdateEvent).recycle(elapsed), true);
 		justLeftSubState = false;
 	}
 	
@@ -135,7 +135,13 @@ class OptionsState extends MusicBeatState
 	{
 		curSelected = FlxMath.wrap(curSelected + diff, 0, options.length - 1);
 		
-		if (scriptGroup.call('onChangeSelection', [curSelected]) == ScriptConstants.STOP_FUNC) return;
+		var event = dispatchEvent('onChangeSelection', EventCache.get(IntEvent).recycle(curSelected));
+		if (event.cancelled)
+		{
+			return;
+		}
+		
+		curSelected = event.value;
 		
 		for (idx => item in grpOptions.members)
 		{

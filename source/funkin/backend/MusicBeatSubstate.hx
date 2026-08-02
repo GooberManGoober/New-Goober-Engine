@@ -8,7 +8,7 @@ import funkin.input.Controls;
 import funkin.data.*;
 import funkin.scripts.*;
 
-class MusicBeatSubstate extends FlxSubState
+class MusicBeatSubState extends FlxSubState
 {
 	public function new()
 	{
@@ -30,12 +30,11 @@ class MusicBeatSubstate extends FlxSubState
 	
 	inline function get_controls():Controls return Controls.instance;
 	
-	public var scripted:Bool = false;
 	public var scriptName:String = '';
 	public var scriptPrefix:String = 'substates';
-	public var scriptGroup:ScriptGroup = new ScriptGroup();
+	public var stateScripts:ScriptGroup = new ScriptGroup();
 	
-	public function initStateScript(?scriptName:String, callOnLoad:Bool = true):Bool
+	public function initStateScript(?scriptName:String, callOnLoad:Bool = true):Void
 	{
 		if (scriptName == null)
 		{
@@ -49,24 +48,22 @@ class MusicBeatSubstate extends FlxSubState
 		
 		if (FunkinAssets.exists(scriptFile))
 		{
-			var _script = FunkinScript.fromFile(scriptFile);
-			if (_script.parsingFailed())
+			var newScript = FunkinScript.fromFile(scriptFile, null, false);
+			stateScripts.addScript(newScript);
+			newScript.execute();
+			if (newScript.parsingFailed())
 			{
-				_script = FlxDestroyUtil.destroy(_script);
-				return false;
+				stateScripts.removeScript(newScript);
+				newScript = FlxDestroyUtil.destroy(newScript);
+				return;
 			}
-			
-			scriptGroup.parent = this;
 			
 			Logger.log('script [$scriptName] initialized', NOTICE);
 			
-			scriptGroup.addScript(_script);
-			scripted = true;
+			stateScripts.addScript(newScript);
 		}
 		
-		if (callOnLoad) scriptGroup.call('onLoad', []);
-		
-		return scripted;
+		if (callOnLoad) stateScripts.call('onLoad');
 	}
 	
 	public function refreshZ(?group:FlxTypedGroup<FlxBasic>)
@@ -82,18 +79,26 @@ class MusicBeatSubstate extends FlxSubState
 		updateCurStep();
 		updateBeat();
 		
-		if (oldStep != curStep)
+		if (curStep > oldStep)
 		{
-			if (curStep > 0) stepHit();
-			
-			if (PlayState.SONG != null)
+			for (step in oldStep...curStep)
 			{
-				if (oldStep < curStep) updateSection();
-				else rollbackSection();
+				curStep = step + 1;
+				
+				updateBeat();
+				
+				if (curStep >= 0)
+				{
+					stepHit();
+					if (curStep % 4 == 0) beatHit();
+				}
 			}
+			
+			if (PlayState.SONG != null) updateSection();
 		}
+		else if (PlayState.SONG != null) rollbackSection();
 		
-		scriptGroup.call('onUpdate', [elapsed]);
+		dispatchEvent('onUpdate', EventCache.get(UpdateEvent).recycle(elapsed), true);
 		
 		super.update(elapsed);
 	}
@@ -153,26 +158,37 @@ class MusicBeatSubstate extends FlxSubState
 	
 	public function stepHit():Void
 	{
-		if (curStep % 4 == 0) beatHit();
-		scriptGroup.call('onStepHit', [curStep]);
+		dispatchEvent('onStepHit', EventCache.get(IntEvent).recycle(curStep), true);
 	}
 	
 	public function beatHit():Void
 	{
-		scriptGroup.call('onBeatHit', [curBeat]);
+		dispatchEvent('onBeatHit', EventCache.get(IntEvent).recycle(curBeat), true);
 	}
 	
 	public function sectionHit()
 	{
-		scriptGroup.call('onSectionHit');
+		dispatchEvent('onSectionHit', EventCache.get(IntEvent).recycle(curSection), true);
 	}
 	
 	override function destroy()
 	{
-		scriptGroup.call('onDestroy', []);
+		stateScripts.call('onDestroy');
 		
-		scriptGroup = FlxDestroyUtil.destroy(scriptGroup);
+		stateScripts = FlxDestroyUtil.destroy(stateScripts);
 		
 		super.destroy();
+	}
+	
+	/**
+	 * Dispatches a event onto all scriptGroups
+	 * 
+	 * Whatever groups this will be called onto changes per state implementation
+	 */
+	public function dispatchEvent<T:BasicEvent>(func:String, event:T, immutablePropogation:Bool = false):T
+	{
+		stateScripts.event(func, event, immutablePropogation);
+		
+		return event;
 	}
 }

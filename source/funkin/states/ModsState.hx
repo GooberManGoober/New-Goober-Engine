@@ -120,7 +120,7 @@ class ModsState extends MusicBeatState
 		if (FlxG.keys.justPressed.TAB) makeTopMod(modList[curDir]);
 		if (controls.BACK)
 		{
-			Mods.currentModDirectory = topMod;
+			Mods.changeModDirectory(topMod);
 			
 			if (reset)
 			{
@@ -217,7 +217,8 @@ class ModsState extends MusicBeatState
 		var mod = tempMod;
 		
 		reset = true;
-		Mods.currentModDirectory = mod.folder;
+		Mods.changeModDirectory(mod.folder);
+		
 		Mods.updateModList(mod.folder);
 		Mods.loadTopMod();
 		
