@@ -7,19 +7,19 @@ import flixel.math.FlxPoint;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 
-import funkin.backend.MusicBeatSubState;
+import funkin.backend.MusicBeatSubstate;
 import funkin.states.PlayState;
 import funkin.objects.Character;
 
 /**
  * The substate that goes over the game whenever the player dies.
  */
-class GameOverSubState extends MusicBeatSubState
+class GameOverSubstate extends MusicBeatSubstate
 {
 	/**
 	 * Static reference to the substate. Used for scripting purposes.
 	 */
-	public static var instance:Null<GameOverSubState> = null;
+	public static var instance:Null<GameOverSubstate> = null;
 	
 	/**
 	 * The name of the game over character to use.
@@ -74,7 +74,8 @@ class GameOverSubState extends MusicBeatSubState
 		PlayState.instance?.scripts.set('inGameOver', true);
 		
 		Conductor.songPosition = 0;
-		if (!PlayState.instance?.dispatchEvent('onGameOverStart', EventCache.get(BasicEvent).basicRecycle()).cancelled)
+		
+		if (PlayState.instance?.scripts.call('onGameOverStart', []) != ScriptConstants.STOP_FUNC)
 		{
 			if (boyfriend == null)
 			{
@@ -133,12 +134,12 @@ class GameOverSubState extends MusicBeatSubState
 		
 		if (controls.ACCEPT)
 		{
-			if (!PlayState.instance?.dispatchEvent('onGameOverConfirm', EventCache.get(BasicEvent).basicRecycle()).cancelled) endBullshit();
+			if (PlayState.instance?.scripts.call('onGameOverConfirm', []) != ScriptConstants.STOP_FUNC) endBullshit();
 		}
 		
 		if (controls.BACK)
 		{
-			if (!PlayState.instance?.dispatchEvent('onGameOverCancel', EventCache.get(BasicEvent).basicRecycle()).cancelled)
+			if (PlayState.instance?.scripts.call('onGameOverCancel', []) != ScriptConstants.STOP_FUNC)
 			{
 				FlxG.sound.music.stop();
 				PlayState.deathCounter = 0;

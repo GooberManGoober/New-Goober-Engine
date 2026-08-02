@@ -416,9 +416,10 @@ class PlayField extends FlxTypedContainer<StrumNote>
 		
 		spawnSusSplash(note, field.playerControls);
 		
-		PlayState.instance.dispatchEvent('hit', EventCache.get(NoteEvent).recycle(note));
+		final globalScript = PlayState.instance.callNoteTypeScript(note.noteType, 'hit', scriptArgs);
 		
-		PlayState.instance.dispatchEvent(scriptFunc, EventCache.get(NoteEvent).recycle(note));
+		final noteScriptRet = PlayState.instance.callNoteTypeScript(note.noteType, scriptFunc, scriptArgs);
+		if (noteScriptRet != ScriptConstants.STOP_FUNC) PlayState.instance.scripts.call(scriptFunc, scriptArgs, false, [note.noteType]);
 		
 		if (!note.isSustainNote) disposeNote(note);
 	}
@@ -448,7 +449,10 @@ class PlayField extends FlxTypedContainer<StrumNote>
 			}
 		}
 		
-		PlayState.instance.dispatchEvent('noteMiss', EventCache.get(NoteEvent).recycle(note));
+		final scriptArgs:Array<Dynamic> = [note, field.ID];
+		
+		final noteScriptRet = PlayState.instance.callNoteTypeScript(note.noteType, 'noteMiss', scriptArgs);
+		if (noteScriptRet != ScriptConstants.STOP_FUNC) PlayState.instance.scripts.call('noteMiss', scriptArgs, false, [note.noteType]);
 		
 		// hold note missing stuff, makes the hold unhittable (and kills it, might make it just transparent if i can fix some stuff)
 		if (!note.hitCausesMiss && !note.canMiss)
@@ -530,8 +534,7 @@ class PlayField extends FlxTypedContainer<StrumNote>
 				final ghostAnim:String = char.getAnimName();
 				
 				if (!note.isSustainNote && Math.abs(char.lastHitTime - note.strumTime) < 3
-					&& char.ghostsEnabled && PlayState.instance?.scripts.event('onGhostAnim', EventCache.get(NoteEvent).recycle(note))
-					.cancelled) // && PlayState.instance?.scripts.call('onGhostAnim', [ghostAnim, note]) != ScriptConstants.STOP_FUNC)
+					&& char.ghostsEnabled && PlayState.instance?.scripts.call('onGhostAnim', [ghostAnim, note]) != ScriptConstants.STOP_FUNC)
 				{
 					char.playGhostAnim(note.noteData, ghostAnim, true);
 				}
@@ -577,7 +580,7 @@ class PlayField extends FlxTypedContainer<StrumNote>
 	public function spawnSusSplash(note:Note, isPlayer:Bool = false):SustainSplash
 	{
 		if ((ClientPrefs.noteSplashType == "Both" || ClientPrefs.noteSplashType == "Hold Covers")
-			&& _skin?.sustainSplashes
+			&& _skin?.sustainSplashes 
 			&& note.tail.length > 0)
 		{
 			final strum:Null<StrumNote> = note.playField.members[note.noteData];

@@ -235,6 +235,9 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		set('curBpm', Conductor.bpm);
 		set('crotchet', Conductor.crotchet);
 		set('stepCrotchet', Conductor.stepCrotchet);
+		set('Function_Halt', funkin.scripting.ScriptConstants.HALT_FUNC);
+		set('Function_Stop', funkin.scripting.ScriptConstants.STOP_FUNC);
+		set('Function_Continue', funkin.scripting.ScriptConstants.CONTINUE_FUNC);
 		set('curBeat', 0);
 		set('curStep', 0);
 		set('curSection', 0);
@@ -322,12 +325,12 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		
 		// for compat
 		set('HScriptState', funkin.scripting.ScriptedState);
-		set('HScriptSubState', funkin.scripting.ScriptedSubState);
+		set('HScriptSubstate', funkin.scripting.ScriptedSubstate);
 		
 		set('ScriptedState', funkin.scripting.ScriptedState);
-		set('ScriptedSubState', funkin.scripting.ScriptedSubState);
+		set('ScriptedSubstate', funkin.scripting.ScriptedSubstate);
 		
-		set("GameOverSubState", funkin.states.substates.GameOverSubState);
+		set("GameOverSubstate", funkin.states.substates.GameOverSubstate);
 		
 		// objects
 		set("Note", funkin.objects.note.Note);
@@ -402,11 +405,5 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		}
 		
 		set("newShader", FunkinRuntimeShader.fromPath);
-	}
-	
-	public function event<T:BasicEvent>(func:String, event:T):T
-	{
-		call(func, [event]);
-		return event;
 	}
 }

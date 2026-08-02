@@ -51,7 +51,7 @@ import funkin.states.*;
 import funkin.objects.*;
 import funkin.objects.note.*;
 import funkin.states.editors.ui.EditorNote;
-import funkin.backend.MusicBeatSubState;
+import funkin.backend.MusicBeatSubstate;
 import funkin.states.editors.ChartEditorState;
 
 #if sys
@@ -2449,7 +2449,7 @@ class OLDChartEditorState extends MusicBeatState
 		// 			{
 		// 				ease: FlxEase.quartOut,
 		// 				onComplete: function(shit:FlxTween) {
-		// 					openSubState(new ChartingInfoSubState());
+		// 					openSubState(new ChartingInfoSubstate());
 		// 				}
 		// 			});
 		// 	}
@@ -3463,7 +3463,7 @@ class OLDChartEditorState extends MusicBeatState
 			}
 		}
 		
-		var note:EditorNote = new EditorNote(daStrumTime, intendedData % _song.keys, null, false, true);
+		var note:EditorNote = new EditorNote(daStrumTime, intendedData % _song.keys, null, null, true);
 		note.lane = Std.int(Math.max(Math.floor(intendedData / _song.keys), 0));
 		note.noteData = intendedData % _song.keys;
 		note.alreadyShifted = true;
@@ -3903,7 +3903,7 @@ class OLDChartEditorState extends MusicBeatState
 		
 		toggleMusic(!FlxG.sound.music.playing);
 	}
-} // class ChartingInfoSubState extends MusicBeatSubState
+} // class ChartingInfoSubstate extends MusicBeatSubstate
 
 // {
 // 	var text:String = '';
@@ -3976,7 +3976,7 @@ class OLDChartEditorState extends MusicBeatState
 // 	}
 // }
 
-class ChartingOptionsSubmenuOLD extends MusicBeatSubState
+class ChartingOptionsSubmenuOLD extends MusicBeatSubstate
 {
 	var grpMenuShit:FlxTypedGroup<Alphabet>;
 	var menuItems:Array<String> = [

@@ -52,42 +52,6 @@ class ScriptGroup implements IFlxDestroyable
 		@:bypassAccessor this.parent = parent;
 	}
 	
-	public function addScriptFromPath(path:String, name:String, allowDupeNames:Bool = false):Null<FunkinScript>
-	{
-		if (!allowDupeNames && exists(name)) return null;
-		
-		var script:FunkinScript = FunkinScript.fromFile(path, name, false);
-		copyGroup(script);
-		script.execute();
-		
-		if (script.parsingFailed())
-		{
-			script = FlxDestroyUtil.destroy(script);
-			return null;
-		}
-		
-		addScript(script);
-		return script;
-	}
-	
-	public function addScriptFromString(str:String, name:String, allowDupeNames:Bool = false):Null<FunkinScript>
-	{
-		if (!allowDupeNames && exists(name)) return null;
-		
-		var script:FunkinScript = FunkinScript.fromString(str, name, false);
-		copyGroup(script);
-		script.execute();
-		
-		if (script.parsingFailed())
-		{
-			script = FlxDestroyUtil.destroy(script);
-			return null;
-		}
-		
-		addScript(script);
-		return script;
-	}
-	
 	/**
 	 * Adds a new script to the group.
 	 * @param script 
@@ -122,27 +86,27 @@ class ScriptGroup implements IFlxDestroyable
 	}
 	
 	@:inheritDoc(funkin.scripts.FunkinScript.set)
-	public function set(varToSet:String, value:Dynamic)
+	public function set(varName:String, arg:Dynamic)
 	{
-		for (script in members)
+		for (i in members)
 		{
-			script.set(varToSet, value);
+			i.set(varName, arg);
 		}
 	}
 	
 	@:inheritDoc(funkin.scripts.FunkinScript.call)
-	public function call(func:String, ?args:Array<Dynamic>, ignoreStops:Bool = false, ?exclusions:Array<String>):Dynamic
+	public function call(event:String, ?args:Array<Dynamic>, ignoreStops:Bool = false, ?exclusions:Array<String>):Dynamic
 	{
 		exclusions ??= [];
 		var returnVal:Dynamic = ScriptConstants.CONTINUE_FUNC;
-		for (script in members)
+		for (i in members)
 		{
-			if (script == null || !script.exists(func) || exclusions.contains(script.name))
+			if (i == null || !i.exists(event) || exclusions.contains(i.name))
 			{
 				continue;
 			}
 			
-			var ret:Dynamic = script.call(func, args)?.returnValue;
+			var ret:Dynamic = i.call(event, args)?.returnValue;
 			if (ret != null)
 			{
 				if (ret == ScriptConstants.HALT_FUNC)
@@ -156,33 +120,6 @@ class ScriptGroup implements IFlxDestroyable
 		}
 		
 		return returnVal;
-	}
-	
-	/**
-	 * `call` but specifically for events.
-	 * 
-	 * Honors a events `shouldPropogate` value.
-	 * @param func the method to call
-	 * @return The event.
-	 */
-	public function event<T:BasicEvent>(func:String, event:T, immutablePropogation:Bool = false):T
-	{
-		var args = [event];
-		for (script in members)
-		{
-			if (script == null || !script.exists(func))
-			{
-				continue;
-			}
-			
-			if (!event.shouldPropogate && !immutablePropogation)
-			{
-				break;
-			}
-			
-			script.call(func, args);
-		}
-		return event;
 	}
 	
 	/**
@@ -204,13 +141,6 @@ class ScriptGroup implements IFlxDestroyable
 		for (script in members)
 			if (script.name == name) return true;
 		return false;
-	}
-	
-	public var length(get, never):Int;
-	
-	public inline function get_length():Int
-	{
-		return members.length;
 	}
 	
 	/**
