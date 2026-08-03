@@ -41,7 +41,7 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 			'hitsoundType',
 			STRING,
 			'NMV',
-			['NMV', 'Psych']
+			['NMV', 'Psych', 'V-Slice']
 		);
 		addOption(option);
 		option.onChange = onChangeHitsound;

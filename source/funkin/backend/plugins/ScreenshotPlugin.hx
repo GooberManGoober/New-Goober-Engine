@@ -397,11 +397,6 @@ class ScreenshotPlugin extends FlxBasic
         return state;
     }
 
-    static function getScreenshotPath():String
-    {
-        return '$SCREENSHOT_FOLDER/';
-    }
-
     static function makeScreenshotPath():Void
     {
         FileUtil.createDirIfNotExists(SCREENSHOT_FOLDER);
@@ -423,7 +418,7 @@ class ScreenshotPlugin extends FlxBasic
         if (previousScreenshotName != targetPath && previousScreenshotName != (targetPath + ' (${previousScreenshotCopyNum})'))
         {
             previousScreenshotName = targetPath;
-            targetPath = getScreenshotPath() + targetPath + '.png';
+            targetPath = '$SCREENSHOT_FOLDER/$targetPath.png';
             previousScreenshotCopyNum = 2;
         }
         else
@@ -435,7 +430,7 @@ class ScreenshotPlugin extends FlxBasic
                 newTargetPath = targetPath + ' (${previousScreenshotCopyNum})';
             }
             previousScreenshotName = newTargetPath;
-            targetPath = getScreenshotPath() + newTargetPath + '.png';
+            targetPath = '$SCREENSHOT_FOLDER/$newTargetPath.png';
         }
 
         // TODO: Make screenshot saving work on browser.
