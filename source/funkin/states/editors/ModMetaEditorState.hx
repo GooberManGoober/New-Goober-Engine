@@ -2,6 +2,8 @@ package funkin.states.editors;
 
 import funkin.Mods;
 
+import haxe.Json;
+
 import haxe.ui.backend.flixel.UIState;
 import haxe.ui.containers.dialogs.CollapsibleDialog;
 
@@ -21,13 +23,15 @@ class ModMetaEditorState extends UIState
 	var name:FlxText;
 	var icon:FlxSprite;
 
-	var _pack:ModMeta;
+	var directoryTxt:FlxText;
 
-	public function new(modPack:String)
+	var modPack:ModMeta;
+
+	public function new(shitFuck:String)
 	{
 		super();
 		
-		_pack = Mods.getPack(modPack);
+		modPack = Mods.getPack(shitFuck);
 	}
 	
 	override function create()
@@ -45,7 +49,7 @@ class ModMetaEditorState extends UIState
 		box.screenCenter().x += 135;
 		add(box);
 		
-		var text = (_pack == null || _pack.description == null) ? "No description provided." : _pack.description;
+		var text = (modPack == null || modPack.description == null) ? "No description provided." : modPack.description;
 
 		description = new FlxText();
 		description.setFormat(Paths.DEFAULT_FONT, 28, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -55,7 +59,7 @@ class ModMetaEditorState extends UIState
 		add(description);
 		
 		
-		var iPath = _pack == null ? Paths.image("branding/icon/fallback") : Paths.image(_pack.iconFile);
+		var iPath = modPack == null ? Paths.image("branding/icon/fallback") : Paths.image(modPack.iconFile);
 		if (iPath == null) iPath = Paths.image("branding/icon/fallback");
 
 		icon = new FlxSprite();
@@ -67,7 +71,7 @@ class ModMetaEditorState extends UIState
 
 		name = new FlxText();
 		name.setFormat(Paths.DEFAULT_FONT, 40, FlxColor.WHITE, FlxTextAlign.CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		name.text = (_pack == null ? Mods.currentModDirectory : _pack.name);
+		name.text = (modPack == null ? Mods.currentModDirectory : modPack.name);
 		name.setPosition(icon.x + icon.width + 10, icon.y + (icon.height - name.height) / 2);
 		add(name);
 		
@@ -78,7 +82,7 @@ class ModMetaEditorState extends UIState
 		textBG.alpha = 0.6;
 		add(textBG);
 		
-		var directoryTxt:FlxText = new FlxText(textBG.x, textBG.y + 4, FlxG.width, 'Loaded Mod Directory: ${Mods.currentModDirectory}', 32);
+		directoryTxt = new FlxText(textBG.x, textBG.y + 4, FlxG.width, 'Loaded Mod Directory: ${Mods.currentModDirectory}', 32);
 		directoryTxt.setFormat(Paths.DEFAULT_FONT, 32, FlxColor.WHITE, CENTER);
 		directoryTxt.scrollFactor.set();
 		directoryTxt.text = directoryTxt.text.toUpperCase();
@@ -89,8 +93,8 @@ class ModMetaEditorState extends UIState
 		add(dialog);
 
 		dialog.x = 10;
-		dialog.y = 50;
-		dialog.bindDialogToView(50);
+		dialog.y = box.y;
+		dialog.bindDialogToView(box.y);
 
 		bindDialog();
 	}
@@ -111,10 +115,31 @@ class ModMetaEditorState extends UIState
 
 	function bindDialog()
 	{
-		dialog.modNameTextField.value = _pack.name;
-		dialog.descTextField.value = (_pack.description == null) ? "No description provided." : _pack.description;
-		dialog.iconFileTextField.value = (_pack.iconFile != null ? _pack.iconFile : 'branding/icon/icon64');
-		dialog.globalCheckbox.selected = _pack.global;
+		dialog.modNameTextField.value = modPack.name;
+		dialog.descTextField.value = modPack.description;
+		dialog.iconFileTextField.value = modPack.iconFile;
+
+		dialog.windowTitleTextField.value = modPack.windowTitle;
+		dialog.defaultTransitionTextField.value = modPack.defaultTransition;
+		dialog.discordClientIDTextField.value = modPack.discordClientID;
+
+		dialog.globalCheckbox.selected = modPack.global;
+
+		if (modPack.stateRedirects != null)
+		{
+			dialog.titleStateTextField.value = modPack.stateRedirects.get('TitleState');
+			dialog.storyMenuStateTextField.value = modPack.stateRedirects.get('StoryMenuState');
+			dialog.mainMenuStateTextField.value = modPack.stateRedirects.get('MainMenuState');
+			dialog.freeplayStateTextField.value = modPack.stateRedirects.get('FreeplayState');
+			dialog.creditsStateTextField.value = modPack.stateRedirects.get('CreditsState');
+			dialog.optionsStateTextField.value = modPack.stateRedirects.get('OptionsState');
+		}
+
+		dialog.defaultFontTextField.value = modPack.defaultFont;
+		dialog.uiPrefixTextField.value = modPack.uiPrefix;
+		dialog.comboPrefixTextField.value = modPack.comboPrefix;
+		dialog.ratingsPrefixTextField.value = modPack.ratingsPrefix;
+		dialog.countdownPrefixTextField.value = modPack.countdownPrefix;
 		
 		dialog.modNameTextField.onChange = function(event) {
 			name.text = dialog.modNameTextField.value;
@@ -133,6 +158,63 @@ class ModMetaEditorState extends UIState
 			icon.setGraphicSize(45);
 			icon.updateHitbox();
 			icon.setPosition(box.x + 15, box.y);
+		}
+
+		dialog.defaultFontTextField.onChange = function(event) {
+			directoryTxt.font = name.font = description.font = dialog.defaultFontTextField.value;
+		}
+
+		dialog.saveButton.onClick = (ev) -> saveMetaToFile();
+	}
+
+	function saveMetaToFile()
+	{
+		final json = {
+			"name": dialog.modNameTextField.value,
+			"global": dialog.globalCheckbox.selected,
+			"description": dialog.descTextField.value,
+		};
+
+		if (dialog.iconFileTextField.value != null && dialog.iconFileTextField.value != "") Reflect.setField(json, "iconFile", dialog.iconFileTextField.value);
+		if (dialog.windowTitleTextField.value != null && dialog.windowTitleTextField.value != "") Reflect.setField(json, "windowTitle", dialog.windowTitleTextField.value);
+		if (dialog.defaultTransitionTextField.value != null && dialog.defaultTransitionTextField.value != "") Reflect.setField(json, "defaultTransition", dialog.defaultTransitionTextField.value);
+		if (dialog.discordClientIDTextField.value != null && dialog.discordClientIDTextField.value != "") Reflect.setField(json, "discordClientID", dialog.discordClientIDTextField.value);
+
+		var redirects = {};
+
+		if (dialog.titleStateTextField.value != null && dialog.titleStateTextField.value != "") Reflect.setField(redirects, "TitleState", dialog.titleStateTextField.value);
+		if (dialog.storyMenuStateTextField.value != null && dialog.storyMenuStateTextField.value != "") Reflect.setField(redirects, "StoryMenuState", dialog.storyMenuStateTextField.value);
+		if (dialog.mainMenuStateTextField.value != null && dialog.mainMenuStateTextField.value != "") Reflect.setField(redirects, "MainMenuState", dialog.mainMenuStateTextField.value);
+		if (dialog.freeplayStateTextField.value != null && dialog.freeplayStateTextField.value != "") Reflect.setField(redirects, "FreeplayState", dialog.freeplayStateTextField.value);
+		if (dialog.creditsStateTextField.value != null && dialog.creditsStateTextField.value != "") Reflect.setField(redirects, "CreditsState", dialog.creditsStateTextField.value);
+		if (dialog.optionsStateTextField.value != null && dialog.optionsStateTextField.value != "") Reflect.setField(redirects, "OptionsState", dialog.optionsStateTextField.value);
+
+		if (redirects != { }) Reflect.setField(json, "stateRedirects", redirects);
+
+		if (dialog.defaultFontTextField.value != null && dialog.defaultFontTextField.value != "") Reflect.setField(json, "defaultFont", dialog.defaultFontTextField.value);
+		if (dialog.uiPrefixTextField.value != null && dialog.uiPrefixTextField.value != "") Reflect.setField(json, "uiPrefix", dialog.uiPrefixTextField.value);
+		if (dialog.comboPrefixTextField.value != null && dialog.comboPrefixTextField.value != "") Reflect.setField(json, "comboPrefix", dialog.comboPrefixTextField.value);
+		if (dialog.ratingsPrefixTextField.value != null && dialog.ratingsPrefixTextField.value != "") Reflect.setField(json, "ratingsPrefix", dialog.ratingsPrefixTextField.value);
+		if (dialog.countdownPrefixTextField.value != null && dialog.countdownPrefixTextField.value != "") Reflect.setField(json, "countdownPrefix", dialog.countdownPrefixTextField.value);
+
+		final dataToSave:String = Json.stringify(json, "\t");
+		
+		if (dataToSave.length > 0)
+		{
+			function onFileSave(path:String)
+			{
+				final char = path.withoutDirectory().withoutExtension();
+				ToolKitUtils.makeNotification('Metadata File Saving', 'Successfully saved.', Success);
+				FlxG.sound.play(Paths.sound('ui/success'));
+			}
+			
+			function onFileCancel()
+			{
+				ToolKitUtils.makeNotification('Metadata File Saving', 'Saving was canceled.', Info);
+				FlxG.sound.play(Paths.sound('ui/warn'));
+			}
+			
+			FileUtil.saveFile(dataToSave, 'meta.json', onFileSave, onFileCancel);
 		}
 	}
 }

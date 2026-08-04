@@ -333,7 +333,7 @@ class PlayState extends MusicBeatState
 		return notes;
 	}
 	
-	public var camZooming:Bool = true;
+	public var camZooming:Bool = false;
 	public var camZoomingMult:Float = 1;
 	public var camZoomingDecay:Float = 1;
 	
@@ -542,7 +542,6 @@ class PlayState extends MusicBeatState
 		if (file == null) return;
 		
 		defaultCamZoom = file.defaultZoom;
-		FlxG.camera.zoom = file.defaultZoom;
 		
 		if (file.camera_speed != null) cameraSpeed = file.camera_speed;
 		
@@ -2268,21 +2267,7 @@ class PlayState extends MusicBeatState
 				isCameraOnForcedPos = false;
 				updateCamOffsets = true;
 				if (!Math.isNaN(Std.parseFloat(value1)) || !Math.isNaN(Std.parseFloat(value2)))
-				{
-					isCameraOnForcedPos = true;
-					updateCamOffsets = false;
-
-					if (camFollowTween != null)
-						camFollowTween.cancel();
-					
-					camFollowTween = FlxTween.tween(camFollowPoint, {
-						x: val1,
-						y: val2
-					}, 1.9 / (cameraSpeed * playbackRate), {ease: FlxEase.expoOut, onComplete: function(twn:FlxTween) {
-							camFollowTween = null;
-						}
-					});
-				}
+					focusCamera("position", val1, val2, 1.9, "CLASSIC", true);
 				
 			case 'Alt Idle Animation':
 				var char:Character = dad;
@@ -2481,7 +2466,7 @@ class PlayState extends MusicBeatState
 		callEventScript(eventName, 'onTrigger', [value1, value2]);
 	}
 
-	public function focusCamera(target:String = 'boyfriend', X:Float = 0, Y:Float = 0, Time:Float = 1, ease:String = 'linear', lockPos:Bool = true)
+	public function focusCamera(target:String = 'boyfriend', X:Float = 0, Y:Float = 0, Time:Float = 1, ease:String = 'linear', lockPos:Bool = true, ?onComplete:Null<TweenCallback> = null)
 	{
 		var positionData:FlxPoint = FlxPoint.get(0, 0);
 		positionData.put();
@@ -2517,6 +2502,10 @@ class PlayState extends MusicBeatState
 
 		updateCamOffsets = (target.toLowerCase() != "position");
 
+		if(onComplete == null){
+			onComplete = function(tween:FlxTween){};
+		}
+
 		if (ease.toLowerCase() == 'classic')
 		{
 			if(camFollow != null)
@@ -2534,10 +2523,7 @@ class PlayState extends MusicBeatState
 					camFollowTween = FlxTween.tween(camFollowPoint, {
 						x: positionData.x,
 						y: positionData.y
-					}, 1.9 / (cameraSpeed * playbackRate), {ease: FlxEase.expoOut, onComplete: function(twn:FlxTween) {
-							camFollowTween = null;
-						}
-					});
+					}, 1.9 / (cameraSpeed * playbackRate), {ease: FlxEase.expoOut, onComplete: onComplete});
 				}
 			}
 		}
@@ -2570,10 +2556,7 @@ class PlayState extends MusicBeatState
 						y: positionData.y
 					}, Time, {
 						ease: CoolUtil.getEaseFromString(ease),
-						onComplete: function(twn:FlxTween)
-						{
-							camFollowTween = null;
-						}
+						onComplete: onComplete
 					});
 				}
 			}
