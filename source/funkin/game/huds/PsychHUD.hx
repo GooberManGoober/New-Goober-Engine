@@ -61,7 +61,7 @@ class PsychHUD extends BaseHUD
 		
 		final healthGraphic = #if MODS_ALLOWED FunkinAssets.exists(Paths.mods('images/${Paths.UI_PREFIX}healthBar')) ? '${Paths.UI_PREFIX}healthBar' : #end 'UI/healthBar';
 		
-		healthBar = new Bar(0, FlxG.height * (!ClientPrefs.downScroll ? 0.89 : 0.11), healthGraphic, function() return healthLerp, FunkinConstants.HEALTH_MIN, FunkinConstants.HEALTH_MAX);
+		healthBar = new Bar(0, FlxG.height * (!ClientPrefs.downScroll ? 0.89 : 0.11), healthGraphic, function() return healthLerp, parent.healthBounds.min, parent.healthBounds.max);
 		healthBar.screenCenter(X);
 		healthBar.leftToRight = false;
 		healthBar.scrollFactor.set();
@@ -286,9 +286,6 @@ class PsychHUD extends BaseHUD
 			
 			if (ClientPrefs.timeBarType != 'Song Name') timeTxt.text = flixel.util.FlxStringUtil.formatTime(secondsTotal, false);
 		}
-		
-		final newPercent:Null<Float> = FlxMath.remapToRange(FlxMath.bound(healthBar.valueFunction(), healthBar.bounds.min, healthBar.bounds.max), healthBar.bounds.min, healthBar.bounds.max, 0, 100);
-		healthBar.percent = (newPercent != null ? newPercent : 0);
 	}
 	
 	override function beatHit()
@@ -313,7 +310,11 @@ class PsychHUD extends BaseHUD
 		iconP2.frameCount = parent.dad.iconFrames;
 	}
 	
-	override function onHealthChange(health:Float) {}
+	override function onHealthChange(health:Float)
+	{
+		final newPercent:Null<Float> = FlxMath.remapToRange(FlxMath.bound(healthBar.valueFunction(), healthBar.bounds.min, healthBar.bounds.max), healthBar.bounds.min, healthBar.bounds.max, 0, 100);
+		healthBar.percent = (newPercent != null ? newPercent : 0);
+	}
 	
 	override function popUpScore(daRating:funkin.game.Rating, combo:Int, note:funkin.objects.note.Note)
 	{

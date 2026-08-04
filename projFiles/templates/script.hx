@@ -38,10 +38,10 @@ function onEventPush(eventNote) {}
 function eventEarlyTrigger(eventName, value1, value2) {}
 
 //
-function onSubStateOpen() {}
+function onSubstateOpen() {}
 
 //
-function onSubStateClose() {}
+function onSubstateClose() {}
 
 //
 function onResume() {}

@@ -7,13 +7,13 @@ import flixel.text.FlxText;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 
-import funkin.backend.MusicBeatSubState;
+import funkin.backend.MusicBeatSubstate;
 
 /**
  * ...
  * @author 
  */
-class Prompt extends MusicBeatSubState
+class Prompt extends MusicBeatSubstate
 {
 	var selected = 0;
 	

@@ -75,7 +75,7 @@ class TitleState extends MusicBeatState
 		
 		Conductor.bpm = 102;
 		
-		if (!dispatchEvent('onStartIntro', EventCache.get(BasicEvent).basicRecycle()).cancelled)
+		if (scriptGroup.call('onStartIntro') != ScriptConstants.STOP_FUNC)
 		{
 			swagShader = new ColorSwap();
 			
@@ -123,7 +123,7 @@ class TitleState extends MusicBeatState
 			initialized = true;
 		}
 		
-		stateScripts.call('onCreatePost');
+		scriptGroup.call('onCreatePost', []);
 	}
 	
 	override function update(elapsed:Float)
@@ -134,7 +134,7 @@ class TitleState extends MusicBeatState
 		
 		if (skippedIntro)
 		{
-			if (pressedEnter && !dispatchEvent('onEnter', EventCache.get(BasicEvent).basicRecycle()).cancelled && !transitioning)
+			if (pressedEnter && scriptGroup.call('onEnter', []) != ScriptConstants.STOP_FUNC && !transitioning)
 			{
 				FlxG.camera.flash(ClientPrefs.flashing ? FlxColor.WHITE : 0x4CFFFFFF, 1);
 				transitioning = true;
@@ -229,7 +229,7 @@ class TitleState extends MusicBeatState
 		if (!closedState)
 		{
 			sickBeats++;
-			stateScripts.set('curBeat', sickBeats);
+			scriptGroup.set('curBeat', sickBeats);
 		}
 		
 		if (logo != null)
@@ -285,7 +285,7 @@ class TitleState extends MusicBeatState
 	
 	public function skipIntro():Void
 	{
-		if (!dispatchEvent('onSkipIntro', EventCache.get(BasicEvent).basicRecycle()).cancelled && !skippedIntro)
+		if (scriptGroup.call('onSkipIntro', []) != ScriptConstants.STOP_FUNC && !skippedIntro)
 		{
 			ngSpr?.kill();
 			textGroup?.kill();

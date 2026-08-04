@@ -9,11 +9,11 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 
 import funkin.objects.*;
-import funkin.backend.MusicBeatSubState;
+import funkin.backend.MusicBeatSubstate;
 import funkin.objects.Character;
 import funkin.objects.nodes.AttachedNode;
 
-class BaseOptionsMenu extends MusicBeatSubState
+class BaseOptionsMenu extends MusicBeatSubstate
 {
 	public var curOption:Option = null;
 	public var curSelected:Int = 0;
@@ -43,8 +43,8 @@ class BaseOptionsMenu extends MusicBeatSubState
 		DiscordClient.changePresence(rpcTitle);
 		
 		initStateScript('Options');
-		stateScripts.set('this', this);
-		stateScripts.set('title', title);
+		scriptGroup.set('this', this);
+		scriptGroup.set('title', title);
 		
 		bg = new FlxSprite().loadGraphic(Paths.image('menus/menuDesat'));
 		bg.color = 0xFFea71fd;
@@ -121,14 +121,14 @@ class BaseOptionsMenu extends MusicBeatSubState
 		changeSelection();
 		reloadCheckboxes();
 		
-		stateScripts.set('bg', bg);
-		stateScripts.set('grpOptions', grpOptions);
-		stateScripts.set('grpTexts', grpTexts);
-		stateScripts.set('checkboxGroup', checkboxGroup);
-		stateScripts.set('descBox', descBox);
-		stateScripts.set('titleText', titleText);
-		stateScripts.set('descText', descText);
-		stateScripts.call('onCreatePost');
+		scriptGroup.set('bg', bg);
+		scriptGroup.set('grpOptions', grpOptions);
+		scriptGroup.set('grpTexts', grpTexts);
+		scriptGroup.set('checkboxGroup', checkboxGroup);
+		scriptGroup.set('descBox', descBox);
+		scriptGroup.set('titleText', titleText);
+		scriptGroup.set('descText', descText);
+		scriptGroup.call('onCreatePost', []);
 	}
 	
 	public function addOption(option:Option)
