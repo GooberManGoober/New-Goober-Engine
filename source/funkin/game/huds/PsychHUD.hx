@@ -20,6 +20,8 @@ class PsychHUD extends BaseHUD
 	var iconP1:HealthIcon;
 	var iconP2:HealthIcon;
 	var scoreTxt:FlxText;
+
+	var healthLerp:Float = 1;
 	
 	var markupEnabled:Bool = true;
 	var rankColors:Map<String, FlxColor> = [
@@ -57,9 +59,9 @@ class PsychHUD extends BaseHUD
 		ratingPrefix = Paths.RATINGS_PREFIX;
 		comboPrefix = Paths.COMBO_PREFIX;
 		
-		final healthGraphic = FunkinAssets.exists(Paths.mods('images/${Paths.UI_PREFIX}healthBar')) ? '${Paths.UI_PREFIX}healthBar' : 'UI/healthBar';
+		final healthGraphic = #if MODS_ALLOWED FunkinAssets.exists(Paths.mods('images/${Paths.UI_PREFIX}healthBar')) ? '${Paths.UI_PREFIX}healthBar' : #end 'UI/healthBar';
 		
-		healthBar = new Bar(0, FlxG.height * (!ClientPrefs.downScroll ? 0.89 : 0.11), healthGraphic, function() return parent.health, FunkinConstants.HEALTH_MIN, FunkinConstants.HEALTH_MAX);
+		healthBar = new Bar(0, FlxG.height * (!ClientPrefs.downScroll ? 0.89 : 0.11), healthGraphic, function() return healthLerp, parent.healthBounds.min, parent.healthBounds.max);
 		healthBar.screenCenter(X);
 		healthBar.leftToRight = false;
 		healthBar.scrollFactor.set();
@@ -73,12 +75,14 @@ class PsychHUD extends BaseHUD
 		iconP1.y = healthBar.y - 75;
 		iconP1.visible = !ClientPrefs.hideHud;
 		iconP1.alphaMultipler = ClientPrefs.healthBarAlpha;
+		iconP1.frameCount = parent.boyfriend.iconFrames;
 		add(iconP1);
 		
 		iconP2 = new HealthIcon(parent.dad.healthIcon, false);
 		iconP2.y = healthBar.y - 75;
 		iconP2.visible = !ClientPrefs.hideHud;
 		iconP2.alphaMultipler = ClientPrefs.healthBarAlpha;
+		iconP2.frameCount = parent.dad.iconFrames;
 		add(iconP2);
 		
 		scoreTxt = new FlxText(0, healthBar.y + 40, FlxG.width, "", 20);
@@ -98,7 +102,7 @@ class PsychHUD extends BaseHUD
 		if (ClientPrefs.downScroll) timeTxt.y = FlxG.height - 44;
 		if (ClientPrefs.timeBarType == 'Song Name') timeTxt.text = PlayState.SONG.song;
 		
-		final timeGraphic = FunkinAssets.exists(Paths.mods('images/${Paths.UI_PREFIX}timeBar')) ? '${Paths.UI_PREFIX}timeBar' : 'UI/timeBar';
+		final timeGraphic = #if MODS_ALLOWED FunkinAssets.exists(Paths.mods('images/${Paths.UI_PREFIX}timeBar')) ? '${Paths.UI_PREFIX}timeBar' : #end 'UI/timeBar';
 		
 		timeBar = new Bar(0, timeTxt.y + (timeTxt.height / 4), timeGraphic, function() return parent.songPercent, 0, 1);
 		timeBar.scrollFactor.set();
@@ -233,6 +237,11 @@ class PsychHUD extends BaseHUD
 		iconP1.updateIconAnim(healthBar.percent * 0.01);
 		iconP2.updateIconAnim((100 - healthBar.percent) * 0.01);
 	}
+
+	function updateHealthBar()
+	{
+		healthLerp = FlxMath.lerp(healthLerp, parent.health, .2 / (ClientPrefs.framerate / 60));
+	}
 	
 	public function reloadHealthBarColors()
 	{
@@ -262,6 +271,7 @@ class PsychHUD extends BaseHUD
 		updateIconsPosition();
 		updateIconsScale(elapsed);
 		updateIconsAnimation();
+		updateHealthBar();
 		
 		if (!parent.startingSong && !parent.paused && parent.updateTime && !parent.endingSong)
 		{
@@ -276,9 +286,6 @@ class PsychHUD extends BaseHUD
 			
 			if (ClientPrefs.timeBarType != 'Song Name') timeTxt.text = flixel.util.FlxStringUtil.formatTime(secondsTotal, false);
 		}
-		
-		final newPercent:Null<Float> = FlxMath.remapToRange(FlxMath.bound(healthBar.valueFunction(), healthBar.bounds.min, healthBar.bounds.max), healthBar.bounds.min, healthBar.bounds.max, 0, 100);
-		healthBar.percent = (newPercent != null ? newPercent : 0);
 	}
 	
 	override function beatHit()
@@ -295,11 +302,19 @@ class PsychHUD extends BaseHUD
 	override function onCharacterChange()
 	{
 		reloadHealthBarColors();
+
 		iconP1.changeIcon(parent.boyfriend.healthIcon);
+		iconP1.frameCount = parent.boyfriend.iconFrames;
+
 		iconP2.changeIcon(parent.dad.healthIcon);
+		iconP2.frameCount = parent.dad.iconFrames;
 	}
 	
-	override function onHealthChange(health:Float) {}
+	override function onHealthChange(health:Float)
+	{
+		final newPercent:Null<Float> = FlxMath.remapToRange(FlxMath.bound(healthBar.valueFunction(), healthBar.bounds.min, healthBar.bounds.max), healthBar.bounds.min, healthBar.bounds.max, 0, 100);
+		healthBar.percent = (newPercent != null ? newPercent : 0);
+	}
 	
 	override function popUpScore(daRating:funkin.game.Rating, combo:Int, note:funkin.objects.note.Note)
 	{

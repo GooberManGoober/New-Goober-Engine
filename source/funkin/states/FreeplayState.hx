@@ -11,6 +11,7 @@ import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.tweens.FlxTween;
+import flixel.util.FlxStringUtil;
 
 import funkin.backend.Difficulty;
 import funkin.Mods;
@@ -85,9 +86,9 @@ class FreeplayState extends MusicBeatState
 		
 		initStateScript();
 		
-		stateScripts.set('SongMetadata', FreeplaySong); // backwards compat bs ig
-		stateScripts.set('FreeplaySong', FreeplaySong);
-		stateScripts.set('WeekData', WeekData);
+		scriptGroup.set('SongMetadata', FreeplaySong); // backwards compat bs ig
+		scriptGroup.set('FreeplaySong', FreeplaySong);
+		scriptGroup.set('WeekData', WeekData);
 		
 		bg = new FlxSprite().loadGraphic(Paths.image('menus/menuDesat'));
 		add(bg);
@@ -166,7 +167,7 @@ class FreeplayState extends MusicBeatState
 		curDifficulty = Math.round(Math.max(0, Difficulty.defaultDifficulties.indexOf(lastDifficultyName)));
 		
 		super.create();
-		stateScripts.call('onCreate');
+		scriptGroup.call('onCreate', []);
 	}
 	
 	override function closeSubState()
@@ -198,6 +199,7 @@ class FreeplayState extends MusicBeatState
 			
 			Mods.currentModDirectory = songs[i].folder;
 			var icon:HealthIcon = new HealthIcon(songs[i].songCharacter);
+			icon.frameCount = songs[i].iconFrames;
 			icon.sprTracker = songText;
 			
 			grpIcons.add(icon);
@@ -211,6 +213,7 @@ class FreeplayState extends MusicBeatState
 		var displayName:String = songName;
 		var icon:String = "face";
 		var color:String = "#8DA399";
+		var iconFrames:Int = 2;
 		
 		final meta = getSongMeta(songName);
 		
@@ -224,10 +227,11 @@ class FreeplayState extends MusicBeatState
 		{
 			if (meta.displayName != null) displayName = meta.displayName;
 			if (meta.freeplayIcon != null) icon = meta.freeplayIcon;
+			if (meta.freeplayIconFrames != null) iconFrames = meta.freeplayIconFrames;
 			if (meta.freeplayColor != null) color = meta.freeplayColor;
 		}
 		
-		songs.push(new FreeplaySong(songName, displayName, weekName, icon, FlxColor.fromString(color)));
+		songs.push(new FreeplaySong(songName, displayName, weekName, icon, iconFrames, FlxColor.fromString(color)));
 	}
 	
 	function weekIsLocked(name:String):Bool
@@ -270,7 +274,7 @@ class FreeplayState extends MusicBeatState
 			ratingSplit[1] += '0';
 		}
 		
-		scoreText.text = 'PERSONAL BEST: ' + lerpScore + ' (' + ratingSplit.join('.') + '%)';
+		scoreText.text = 'PERSONAL BEST: ' + FlxStringUtil.formatMoney(lerpScore, false) + ' (' + ratingSplit.join('.') + '%)';
 		positionHighscore();
 		
 		var shiftMult:Int = 1;
@@ -355,7 +359,7 @@ class FreeplayState extends MusicBeatState
 		if (FlxG.keys.justPressed.CONTROL)
 		{
 			persistentUpdate = false;
-			openSubState(new GameplayChangersSubState());
+			openSubState(new GameplayChangersSubstate());
 		}
 		else if (FlxG.keys.justPressed.SPACE)
 		{
@@ -676,15 +680,17 @@ class FreeplaySong
 	public var songName:String = "";
 	public var week:String = "";
 	public var songCharacter:String = "";
+	public var iconFrames:Int = 2;
 	public var color:Int = -7179779;
 	public var folder:String = "";
 	
-	public function new(song:String, displayName:String, week:String, songCharacter:String, color:Int)
+	public function new(song:String, displayName:String, week:String, songCharacter:String, iconFrames:Int, color:Int)
 	{
 		this.songName = song;
 		this.displayName = displayName;
 		this.week = week;
 		this.songCharacter = songCharacter;
+		this.iconFrames = iconFrames;
 		this.color = color;
 		this.folder = Mods.currentModDirectory;
 		if (this.folder == null) this.folder = '';

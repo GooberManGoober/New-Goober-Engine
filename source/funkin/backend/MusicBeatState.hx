@@ -10,6 +10,7 @@ import flixel.addons.ui.FlxUIState;
 import flixel.addons.transition.FlxTransitionSprite.TransitionStatus;
 
 import funkin.backend.BaseTransitionState;
+import funkin.states.transitions.SwipeTransition;
 import funkin.data.*;
 import funkin.scripts.*;
 import funkin.input.Controls;
@@ -41,14 +42,14 @@ class MusicBeatState extends FlxUIState
 	
 	private var curDecStep:Float = 0;
 	private var curDecBeat:Float = 0;
-	
-	final controls:Controls = Controls.instance;
+	private var controls(get, never):Controls;
 	
 	// script related vars
+	public var scripted:Bool = false;
 	public var scriptName:String = '';
-	public var stateScripts:ScriptGroup = new ScriptGroup();
+	public var scriptGroup:ScriptGroup = new ScriptGroup();
 	
-	public function initStateScript(?scriptName:String, callOnLoad:Bool = true):Void
+	public function initStateScript(?scriptName:String, callOnLoad:Bool = true):Bool
 	{
 		if (scriptName == null)
 		{
@@ -57,27 +58,33 @@ class MusicBeatState extends FlxUIState
 		}
 		
 		final scriptFile = FunkinScript.getPath('scripts/states/$scriptName');
-		if (stateScripts.exists(scriptFile)) return;
+		if (scriptGroup.exists(scriptFile)) return true;
 		
 		this.scriptName = scriptName;
 		
 		if (FunkinAssets.exists(scriptFile))
 		{
-			var newScript = FunkinScript.fromFile(scriptFile, scriptName, false, stateScripts.parent);
-			stateScripts.addScript(newScript);
-			newScript.execute();
+			var newScript = FunkinScript.fromFile(scriptFile, scriptName);
 			if (newScript.parsingFailed())
 			{
-				stateScripts.removeScript(newScript);
 				newScript = FlxDestroyUtil.destroy(newScript);
-				return;
+				return false;
 			}
 			
+			scriptGroup.parent = this;
+			
 			Logger.log('script [$scriptName] initialized', NOTICE);
+			
+			scriptGroup.addScript(newScript);
+			scripted = true;
 		}
 		
-		if (callOnLoad) stateScripts.call('onLoad');
+		if (callOnLoad) scriptGroup.call('onLoad', []);
+		
+		return scripted;
 	}
+	
+	inline function get_controls():Controls return Controls.instance;
 	
 	override function create()
 	{
@@ -90,7 +97,7 @@ class MusicBeatState extends FlxUIState
 		
 		FlxTransitionableState.skipNextTransOut = false;
 		
-		ModPlugin.instance.call('onStateCreate');
+		ModPlugin.instance.callOnPlugins('onStateCreate');
 	}
 	
 	/**
@@ -120,18 +127,15 @@ class MusicBeatState extends FlxUIState
 				
 				updateBeat();
 				
-				if (curStep >= 0)
-				{
-					stepHit();
-					if (curStep % 4 == 0) beatHit();
-				}
+				if (curStep >= 0) stepHit();
 			}
 			
 			if (PlayState.SONG != null) updateSection();
 		}
 		else if (PlayState.SONG != null) rollbackSection();
 		
-		dispatchEvent('onUpdate', EventCache.get(UpdateEvent).recycle(elapsed), true);
+		final scriptArgs = [elapsed];
+		scriptGroup.call('onUpdate', scriptArgs);
 		super.update(elapsed);
 	}
 	
@@ -189,17 +193,21 @@ class MusicBeatState extends FlxUIState
 	
 	public function stepHit():Void
 	{
-		dispatchEvent('onStepHit', EventCache.get(SongTimeEvent).recycle(curStep, curBeat, curSection), true);
+		if (curStep % 4 == 0) beatHit();
+		scriptGroup.call('onStepHit', []);
+		ModPlugin.instance.callOnPlugins('onStepHit');
 	}
 	
 	public function beatHit():Void
 	{
-		dispatchEvent('onBeatHit', EventCache.get(SongTimeEvent).recycle(curStep, curBeat, curSection), true);
+		scriptGroup.call('onBeatHit', []);
+		ModPlugin.instance.callOnPlugins('onBeatHit');
 	}
 	
 	public function sectionHit():Void
 	{
-		dispatchEvent('onSectionHit', EventCache.get(SongTimeEvent).recycle(curStep, curBeat, curSection), true);
+		scriptGroup.call('onSectionHit', []);
+		ModPlugin.instance.callOnPlugins('onSectionHit');
 	}
 	
 	function getBeatsOnSection():Float
@@ -228,30 +236,16 @@ class MusicBeatState extends FlxUIState
 	
 	override function destroy()
 	{
-		stateScripts.call('onDestroy');
+		scriptGroup.call('onDestroy');
 		
-		stateScripts = FlxDestroyUtil.destroy(stateScripts);
+		scriptGroup = FlxDestroyUtil.destroy(scriptGroup);
 		
 		super.destroy();
 	}
 	
 	override function closeSubState()
 	{
-		stateScripts.call('onCloseSubState');
+		scriptGroup.call('onCloseSubState', []);
 		super.closeSubState();
-	}
-	
-	/**
-	 * Dispatches a event onto all scriptGroups
-	 * 
-	 * Whatever groups this will be called onto changes per state implementation
-	 */
-	public function dispatchEvent<T:BasicEvent>(func:String, event:T, immutablePropogation:Bool = false):T
-	{
-		ModPlugin.instance.event(func, event, immutablePropogation);
-		
-		stateScripts.event(func, event, immutablePropogation);
-		
-		return event;
 	}
 }

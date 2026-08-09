@@ -10,11 +10,11 @@ import flixel.util.FlxColor;
 import funkin.data.*;
 import funkin.states.*;
 import funkin.objects.*;
-import funkin.backend.MusicBeatSubState;
+import funkin.backend.MusicBeatSubstate;
 
 using StringTools;
 
-class ResetScoreSubState extends MusicBeatSubState
+class ResetScoreSubState extends MusicBeatSubstate
 {
 	var bg:FlxSprite;
 	var alphabetArray:Array<Alphabet> = [];

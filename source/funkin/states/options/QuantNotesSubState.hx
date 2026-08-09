@@ -11,10 +11,10 @@ import flixel.FlxSprite;
 import funkin.objects.*;
 import funkin.states.substates.*;
 import funkin.game.shaders.*;
-import funkin.backend.MusicBeatSubState;
+import funkin.backend.MusicBeatSubstate;
 import funkin.objects.nodes.AttachedNode;
 
-class QuantNotesSubState extends MusicBeatSubState
+class QuantNotesSubState extends MusicBeatSubstate
 {
 	private static var curSelected:Int = 0;
 	private static var typeSelected:Int = 0;

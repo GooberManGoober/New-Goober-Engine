@@ -25,6 +25,8 @@ class ModsState extends MusicBeatState
 	var modList:Array<ModData> = [];
 	var curDir:Int = 0;
 	var reset:Bool = false;
+
+	var editButton:FlxSprite;
 	
 	public static var topMod:String = '';
 	
@@ -90,11 +92,18 @@ class ModsState extends MusicBeatState
 		
 		add(new FlxSprite().loadGraphic(Paths.image("menus/mods/menuborder1")));
 		add(new FlxSprite(685, 645).loadGraphic(Paths.image("menus/mods/menuborder2")));
+
+		editButton = new FlxSprite(1100, 625).loadGraphic(Paths.image("menus/mods/menuedit"));
+		add(editButton);
 		
 		changeDir(0);
+
+		FlxG.mouse.visible = true;
+
+		super.create();
 	}
 	
-	override public function update(elapsed)
+	override public function update(elapsed:Float)
 	{
 		if (controls.UI_UP_P)
 		{
@@ -111,7 +120,7 @@ class ModsState extends MusicBeatState
 		if (FlxG.keys.justPressed.TAB) makeTopMod(modList[curDir]);
 		if (controls.BACK)
 		{
-			Mods.changeModDirectory(topMod);
+			Mods.currentModDirectory = topMod;
 			
 			if (reset)
 			{
@@ -128,6 +137,15 @@ class ModsState extends MusicBeatState
 				new MainMenuState();
 			});
 		}
+
+		if (FlxG.mouse.overlaps(editButton) && FlxG.mouse.justPressed)
+		{
+			FlxG.switchState(() -> {
+				new funkin.states.editors.ModMetaEditorState(modList[curDir].folder);
+			});
+		}
+
+		super.update(elapsed);
 	}
 	
 	function changeDir(change:Int = 0)
@@ -199,8 +217,7 @@ class ModsState extends MusicBeatState
 		var mod = tempMod;
 		
 		reset = true;
-		Mods.changeModDirectory(mod.folder);
-		
+		Mods.currentModDirectory = mod.folder;
 		Mods.updateModList(mod.folder);
 		Mods.loadTopMod();
 		

@@ -17,8 +17,9 @@ class MasterEditorMenu extends MusicBeatState
 		'Chart Editor',
 		'Character Editor',
 		'Note Skin Editor',
+		'Modchart Editor',
 		'Chart Converter',
-		"Metadata Editor",
+		'Metadata Editor',
 		'Mods Manager',
 		'Week Editor',
 		'Menu Character Editor',
@@ -109,23 +110,25 @@ class MasterEditorMenu extends MusicBeatState
 			var muteMusic:Bool = true;
 			switch (options[curSelected])
 			{
-				case 'Mods Manager':
-					FlxG.switchState(() -> new ModsState());
-				case 'Character Editor':
-					FlxG.switchState(() -> new CharacterEditorState(Character.DEFAULT_CHARACTER, false));
-				case 'Week Editor':
-					FlxG.switchState(() -> new WeekEditorState());
-				case 'Metadata Editor':
-					openSubState(new SongMetaEditor());
-					muteMusic = false;
-				case 'Menu Character Editor':
-					FlxG.switchState(() -> new MenuCharacterEditorState());
 				case 'Chart Editor': // felt it would be cool maybe
 					FlxG.switchState(ChartEditorState.new);
+				case 'Character Editor':
+					FlxG.switchState(() -> new CharacterEditorState(Character.DEFAULT_CHARACTER, false));
 				// case 'Note Skin Editor':
-				// 	FlxG.switchState(() -> new NoteSkinEditor('default'));
+					// 	FlxG.switchState(() -> new NoteSkinEditor('default'));
+				case 'Modchart Editor':
+					FlxG.switchState(() -> new ModchartEditorState());
 				case 'Chart Converter':
 					FlxG.switchState(() -> new ChartConverterState());
+				case 'Metadata Editor':
+					openSubState(new SongMetaEditor());
+					persistentUpdate = false; // makes it so you can't scroll through the options while in this substate
+				case 'Mods Manager':
+					FlxG.switchState(() -> new ModsState());
+				case 'Week Editor':
+					FlxG.switchState(() -> new WeekEditorState());
+				case 'Menu Character Editor':
+					FlxG.switchState(() -> new MenuCharacterEditorState());
 			}
 			if (muteMusic)
 			{
@@ -176,8 +179,7 @@ class MasterEditorMenu extends MusicBeatState
 		if (directories[curDirectory] == null || directories[curDirectory].length < 1) directoryTxt.text = '< No Mod Directory Loaded >';
 		else
 		{
-			Mods.changeModDirectory(directories[curDirectory]);
-			
+			Mods.currentModDirectory = directories[curDirectory];
 			directoryTxt.text = '< Loaded Mod Directory: ' + Mods.currentModDirectory + ' >';
 		}
 		directoryTxt.text = directoryTxt.text.toUpperCase();

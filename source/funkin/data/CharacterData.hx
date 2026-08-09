@@ -63,6 +63,7 @@ class CharacterParser
 		data.ghosts_enabled ??= baseInfo.ghosts_enabled;
 		data.image ??= baseInfo.image;
 		data.dance_every ??= baseInfo.dance_every;
+		data.icon_count ??= baseInfo.icon_count;
 		data.position ??= baseInfo.position;
 		data.camera_position ??= baseInfo.camera_position;
 		data.animations ??= baseInfo.animations;
@@ -339,6 +340,7 @@ class CharacterParser
 			ghosts_enabled: false,
 			image: 'characters/BOYFRIEND',
 			dance_every: 2,
+			icon_count: 2,
 			position: [0, 0],
 			camera_position: [0, 0],
 			animations: [],
@@ -473,7 +475,7 @@ typedef CharacterInfo =
 	 * If the character should hold the last frame during a sing pose
 	 */
 	var ?vslice_sustains:Bool;
-	
+
 	/**
 	 * If the character should show a ghost on double notes
 	 */
@@ -483,6 +485,11 @@ typedef CharacterInfo =
 	 * How many beats between the characters `dance`
 	 */
 	var ?dance_every:Int;
+	
+	/**
+	 * How many frames your `characters` icon has
+	 */
+	var ?icon_count:Int;
 	
 	/**
 	 * Enables characters offsets to be adjusted according to characters scale
@@ -495,7 +502,7 @@ typedef CharacterInfo =
 	var ?_editor_isPlayer:Bool;
 	
 	/**
-	 * optional character to be used for `GameOverSubState`. Has priority over the static vars
+	 * optional character to be used for `GameOverSubstate`. Has priority over the static vars
 	 */
 	var ?gameover_character:String;
 	

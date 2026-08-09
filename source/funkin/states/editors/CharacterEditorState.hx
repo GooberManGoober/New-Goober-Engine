@@ -410,6 +410,12 @@ class CharacterEditorState extends UIState // MUST EXTEND UI STATE needed for ac
 			character.danceEveryNumBeats = ui.value.toInt();
 		}
 		
+		uiElements.characterDialogBox.iconFrameStepper.onChange = (ui) -> {
+			character.iconFrames = ui.value.toInt();
+			healthIcon.frameCount = ui.value.toInt();
+			updateHealthIcon();
+		}
+		
 		uiElements.characterDialogBox.flipXCheckbox.onChange = (ui) -> {
 			if (character.originalFlipX == ui.value.toBool()) return;
 			character.originalFlipX = !character.originalFlipX;
@@ -1163,6 +1169,7 @@ class CharacterEditorState extends UIState // MUST EXTEND UI STATE needed for ac
 		uiElements.characterDialogBox.healthIconTextField.value = character.healthIcon;
 		
 		uiElements.characterDialogBox.danceEveryStepper.value = character.danceEveryNumBeats;
+		uiElements.characterDialogBox.iconFrameStepper.value = character.iconFrames;
 		
 		updateHealthIcon();
 		
@@ -1453,6 +1460,7 @@ class CharacterEditorState extends UIState // MUST EXTEND UI STATE needed for ac
 				"healthbar_colour": character.healthColour,
 				"scalableOffsets": character.scalableOffsets,
 				"dance_every": character.danceEveryNumBeats,
+				"icon_count": character.iconFrames,
 				"_editor_isPlayer": character.isPlayer,
 				
 				"gameover_character": character.gameoverCharacter,
@@ -1566,6 +1574,7 @@ class CharacterEditorState extends UIState // MUST EXTEND UI STATE needed for ac
 			sing_duration: 6.1,
 			scale: 1,
 			dance_every: 2,
+			icon_count: 2,
 			scalableOffsets: true
 		};
 }

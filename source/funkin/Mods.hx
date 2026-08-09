@@ -1,7 +1,5 @@
 package funkin;
 
-import funkin.data.ModPrefs;
-
 import haxe.Json;
 import haxe.DynamicAccess;
 
@@ -101,7 +99,7 @@ class Mods
 	/**
 	 * The primary loaded mod's directory
 	 */
-	public static var currentModDirectory:String = '';
+	public static var currentModDirectory:Null<String> = '';
 	
 	/**
 	 * The primary loaded mod's config data
@@ -220,7 +218,7 @@ class Mods
 			if (FileSystem.exists(folder) && !foldersToCheck.contains(folder)) foldersToCheck.push(Paths.mods(fileToFind));
 			
 			// And lastly, the loaded mod's folder
-			if (Mods.currentModDirectory.length > 0)
+			if (Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0)
 			{
 				var folder:String = Paths.mods(Mods.currentModDirectory + '/' + fileToFind);
 				if (FileSystem.exists(folder) && !foldersToCheck.contains(folder)) foldersToCheck.push(folder);
@@ -228,15 +226,6 @@ class Mods
 		}
 		#end
 		return foldersToCheck;
-	}
-	
-	public static function changeModDirectory(newDir:String):Void // use this fully
-	{
-		if (newDir.length > 0)
-		{
-			Mods.currentModDirectory = newDir;
-			ModPrefs.load();
-		}
 	}
 	
 	public static function getPack(?folder:String):Null<ModMeta>
@@ -280,6 +269,8 @@ class Mods
 	public static function getListAsArray(?top:String = ''):Array<{folder:String, enabled:Bool}>
 	{
 		var list:Array<{folder:String, enabled:Bool}> = [];
+
+		#if MODS_ALLOWED
 		var added:Array<String> = [];
 		if (top == null || top == '') top = currentModDirectory;
 		
@@ -317,6 +308,7 @@ class Mods
 				list.push({folder: folder, enabled: true});
 			}
 		}
+		#end
 		
 		return list;
 	}
@@ -345,7 +337,7 @@ class Mods
 		currentModDirectory = '';
 		#if MODS_ALLOWED
 		var list:Array<String> = Mods.parseList().enabled;
-		if (list != null && list[0] != null) changeModDirectory(list[0]);
+		if (list != null && list[0] != null) Mods.currentModDirectory = list[0];
 		applyModConfig();
 		#end
 	}

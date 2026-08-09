@@ -17,9 +17,9 @@ import flixel.input.keyboard.FlxKey;
 import funkin.objects.*;
 import funkin.states.substates.*;
 import funkin.input.InputFormatter;
-import funkin.backend.MusicBeatSubState;
+import funkin.backend.MusicBeatSubstate;
 
-class ControlsSubState extends MusicBeatSubState
+class ControlsSubState extends MusicBeatSubstate
 {
 	public static inline final NONE:Int = -2;
 	
@@ -67,8 +67,9 @@ class ControlsSubState extends MusicBeatSubState
 			{label: "Pause", action: PAUSE},
 			null,
 		];
-		
+
 		WINDOW_GROUP = [
+			{label: "Screenshot", action: SCREENSHOT},
 			{label: "Fullscreen", action: FULLSCREEN},
 			null,
 		];
@@ -81,8 +82,8 @@ class ControlsSubState extends MusicBeatSubState
 		];
 		
 		DEBUG_GROUP = [
-			{label: "Key 1", action: "debug_1"},
-			{label: "Key 2", action: "debug_2"},
+			{label: "Chart", action: "debug_1"},
+			{label: "Char", action: "debug_2"},
 			{label: "Debug Display", action: SWITCH_DEBUG_DISPLAY},
 			{label: "Soft Reload", action: SOFT_RELOAD},
 			{label: "Hard Reload", action: HARD_RELOAD},
@@ -113,7 +114,7 @@ class ControlsSubState extends MusicBeatSubState
 		add(camPos);
 		
 		initStateScript('ControlsSubState');
-		stateScripts.set('this', this);
+		scriptGroup.set('this', this);
 		
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menus/menuDesat'));
 		bg.scrollFactor.y = 0;
@@ -130,7 +131,7 @@ class ControlsSubState extends MusicBeatSubState
 		
 		final group = new ControlsGroup("UI", UI_GROUP, group.groupLastIndex);
 		controlsGroup.add(group);
-		
+
 		final group = new ControlsGroup("WINDOW", WINDOW_GROUP, group.groupLastIndex);
 		controlsGroup.add(group);
 		
@@ -160,13 +161,13 @@ class ControlsSubState extends MusicBeatSubState
 			optionsList[i].index = NONE;
 		}
 		
-		stateScripts.set('device', device);
-		stateScripts.set('optionsList', optionsList);
-		stateScripts.set('controlsGroup', controlsGroup);
-		stateScripts.set('resetKeysLabel', resetKeysLabel);
-		stateScripts.set('resetGamepadLabel', resetGamepadLabel);
-		stateScripts.set('bg', bg);
-		stateScripts.call('onCreatePost');
+		scriptGroup.set('device', device);
+		scriptGroup.set('optionsList', optionsList);
+		scriptGroup.set('controlsGroup', controlsGroup);
+		scriptGroup.set('resetKeysLabel', resetKeysLabel);
+		scriptGroup.set('resetGamepadLabel', resetGamepadLabel);
+		scriptGroup.set('bg', bg);
+		scriptGroup.call('onCreatePost', []);
 	}
 	
 	function refreshOptionsList()
@@ -186,7 +187,7 @@ class ControlsSubState extends MusicBeatSubState
 			else group.visible = false;
 		}
 		if (index > optionsList.length) index = optionsList.length;
-		stateScripts.set('optionsList', optionsList);
+		scriptGroup.set('optionsList', optionsList);
 	}
 	
 	var leaving:Bool = false;
@@ -316,7 +317,7 @@ class ControlsSubState extends MusicBeatSubState
 			this.device = device;
 			resetKeysLabel.visible = device == Keys;
 			resetGamepadLabel.visible = device != Keys;
-			stateScripts.set('device', device);
+			scriptGroup.set('device', device);
 			refreshOptionsList();
 		}
 		
@@ -458,7 +459,6 @@ class ControlsOption extends FlxSpriteContainer
 		super(x, y);
 		this.label = new Alphabet(0, 0, label, true);
 		add(this.label);
-		
 		binds = new FlxTypedSpriteContainer<Alphabet>(700, -55);
 		add(binds);
 		

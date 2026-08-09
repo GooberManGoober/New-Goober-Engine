@@ -55,7 +55,7 @@ class FunkinGame extends flixel.FlxGame
 			
 			for (key in Mods.currentModConfig.stateRedirects.keys())
 			{
-				if (key == stateName && !FunkinConstants.STATE_REDIRECT_BLACKLIST.contains(key))
+				if (key == stateName)
 				{
 					final scriptName = Mods.currentModConfig.stateRedirects.get(stateName);
 					if (!FunkinAssets.exists(FunkinScript.getPath('scripts/states/$scriptName')))

@@ -23,8 +23,6 @@ class Init extends FlxState
 		
 		ClientPrefs.load();
 		
-		funkin.data.ModPrefs.init();
-		
 		funkin.data.Highscore.load();
 		
 		if (FlxG.save.data.weekCompleted != null) funkin.states.StoryMenuState.weekCompleted = FlxG.save.data.weekCompleted;
@@ -58,8 +56,6 @@ class Init extends FlxState
 		
 		funkin.scripts.FunkinScript.init();
 		
-		funkin.scripting.EventCache.init();
-		
 		// ready backends
 		funkin.backend.plugins.HotReloadPlugin.init();
 		
@@ -68,6 +64,8 @@ class Init extends FlxState
 		funkin.backend.plugins.DebugTextPlugin.init();
 		
 		funkin.backend.plugins.FullScreenPlugin.init();
+
+		funkin.backend.plugins.ScreenshotPlugin.initialize();
 		
 		#if VIDEOS_ALLOWED
 		funkin.video.FunkinVideoSprite.init();

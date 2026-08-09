@@ -48,7 +48,8 @@ enum abstract Action(String) to String from String
 	var BACK = "back";
 	var PAUSE = "pause";
 	var RESET = "reset";
-	
+
+	var SCREENSHOT = "screenshot";
 	var FULLSCREEN = "fullscreen";
 	
 	var SWITCH_DEBUG_DISPLAY = "switch_debug_display";
@@ -83,6 +84,7 @@ enum Control
 	ACCEPT;
 	BACK;
 	PAUSE;
+	SCREENSHOT;
 	FULLSCREEN;
 	SWITCH_DEBUG_DISPLAY;
 	SOFT_RELOAD;
@@ -162,9 +164,10 @@ class Controls extends FlxActionSet
 	var _back = new FlxActionDigital(Action.BACK);
 	var _pause = new FlxActionDigital(Action.PAUSE);
 	var _reset = new FlxActionDigital(Action.RESET);
-	
+
 	var _fullscreen = new FlxActionDigital(Action.FULLSCREEN);
-	var switch_debug_display = new FlxActionDigital(Action.SWITCH_DEBUG_DISPLAY);
+	var _screenshot = new FlxActionDigital(Action.SCREENSHOT);
+	var _switch_debug_display = new FlxActionDigital(Action.SWITCH_DEBUG_DISPLAY);
 	
 	var _soft_reload = new FlxActionDigital(Action.SOFT_RELOAD);
 	var _hard_reload = new FlxActionDigital(Action.HARD_RELOAD);
@@ -298,14 +301,18 @@ class Controls extends FlxActionSet
 	public var NOTE_DODGE_R(get, never):Bool;
 	
 	inline function get_NOTE_DODGE_R() return _note_dodgeR.check();
-	
+
 	public var FULLSCREEN(get, never):Bool;
 	
 	inline function get_FULLSCREEN() return _fullscreen.check();
+
+	public var SCREENSHOT(get, never):Bool;
 	
+	inline function get_SCREENSHOT() return _screenshot.check();
+
 	public var SWITCH_DEBUG_DISPLAY(get, never):Bool;
 	
-	inline function get_SWITCH_DEBUG_DISPLAY() return switch_debug_display.check();
+	inline function get_SWITCH_DEBUG_DISPLAY() return _switch_debug_display.check();
 	
 	public var SOFT_RELOAD(get, never):Bool;
 	
@@ -351,7 +358,8 @@ class Controls extends FlxActionSet
 		add(_pause);
 		add(_reset);
 		add(_fullscreen);
-		add(switch_debug_display);
+		add(_screenshot);
+		add(_switch_debug_display);
 		add(_soft_reload);
 		add(_hard_reload);
 		
@@ -379,7 +387,8 @@ class Controls extends FlxActionSet
 			case PAUSE: _pause;
 			case RESET: _reset;
 			case FULLSCREEN: _fullscreen;
-			case SWITCH_DEBUG_DISPLAY: switch_debug_display;
+			case SCREENSHOT: _screenshot;
+			case SWITCH_DEBUG_DISPLAY: _switch_debug_display;
 			case SOFT_RELOAD: _soft_reload;
 			case HARD_RELOAD: _hard_reload;
 		}
@@ -441,8 +450,10 @@ class Controls extends FlxActionSet
 				func(_reset, JUST_PRESSED);
 			case FULLSCREEN:
 				func(_fullscreen, JUST_PRESSED);
+			case SCREENSHOT:
+				func(_screenshot, JUST_PRESSED);
 			case SWITCH_DEBUG_DISPLAY:
-				func(switch_debug_display, JUST_PRESSED);
+				func(_switch_debug_display, JUST_PRESSED);
 			case SOFT_RELOAD:
 				func(_soft_reload, JUST_PRESSED);
 			case HARD_RELOAD:
@@ -638,8 +649,9 @@ class Controls extends FlxActionSet
 				inline bindKeys(Control.BACK, keysMap.get('back'));
 				inline bindKeys(Control.PAUSE, keysMap.get('pause'));
 				inline bindKeys(Control.RESET, keysMap.get('reset'));
-				
+
 				inline bindKeys(Control.FULLSCREEN, keysMap.get('fullscreen'));
+				inline bindKeys(Control.SCREENSHOT, keysMap.get('screenshot'));
 				inline bindKeys(Control.SWITCH_DEBUG_DISPLAY, keysMap.get('switch_debug_display'));
 				
 				inline bindKeys(Control.SOFT_RELOAD, keysMap.get('soft_reload'));

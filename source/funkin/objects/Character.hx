@@ -146,6 +146,11 @@ class Character extends Bopper
 	 */
 	public var vSliceSustains = false;
 	
+	/**
+	 *	Decides how many frames the icon hase
+	 */
+	public var iconFrames:Int = 2;
+	
 	public function new(x:Float = 0, y:Float = 0, character:String = 'bf', isPlayer:Bool = false)
 	{
 		super(x, y);
@@ -195,6 +200,8 @@ class Character extends Bopper
 		this.antialiasing = !noAntialiasing && ClientPrefs.globalAntialiasing;
 		
 		this.danceEveryNumBeats = json.dance_every ?? 2;
+		
+		this.iconFrames = json.icon_count ?? 2;
 		
 		this.gameoverCharacter = json.gameover_character;
 		this.gameoverConfirmDeathSound = json.gameover_confirm_sound;
@@ -324,7 +331,7 @@ class Character extends Bopper
 		}
 		super.draw();
 	}
-	
+
 	function set_holding(isIt:Bool):Bool
 	{
 		if (!isIt && holding && holdTimer >= Conductor.stepCrotchet * 0.001 * singDuration)

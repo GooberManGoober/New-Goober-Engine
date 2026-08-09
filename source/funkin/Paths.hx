@@ -54,7 +54,7 @@ class Paths
 	 * @param checkMods If true, will search through Mod directories
 	 * @return The path to the file.
 	 */
-	public static function getPath(file:String, ?parentFolder:String, checkMods:Bool = true):String
+	public static function getPath(file:String, ?parentFolder:String, checkMods:Bool = false):String
 	{
 		if (parentFolder != null) file = '$parentFolder/$file';
 		
@@ -427,7 +427,7 @@ class Paths
 			final folder = mods(directory);
 			if (FileSystem.exists(folder) && !folders.contains(folder)) folders.push(folder);
 			
-			if (Mods.currentModDirectory.length > 0)
+			if (Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0)
 			{
 				final folder = mods('${Mods.currentModDirectory}/$directory');
 				if (FileSystem.exists(folder) && !folders.contains(folder)) folders.push(folder);
@@ -461,7 +461,7 @@ class Paths
 	 */
 	public static function modFolders(key:String):String
 	{
-		if (Mods.currentModDirectory.length > 0)
+		if (Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0)
 		{
 			final fileToCheck:String = mods(Mods.currentModDirectory + '/' + key);
 			// trace(fileToCheck);

@@ -82,7 +82,7 @@ class PlayField extends FlxTypedContainer<StrumNote>
 	public var offsetReceptors:Bool = false;
 	public var player:Int = 0;
 	public var alpha(default, set):Float = 1;
-	
+
 	public var underlaySpr:FlxSprite;
 	public var underlayAlphaMult:Float = 1;
 	
@@ -165,12 +165,12 @@ class PlayField extends FlxTypedContainer<StrumNote>
 		var sus = new SustainSplash(0, 0, 0, 0);
 		grpSusSplashes.add(sus);
 		sus.alpha = 0.0;
-		
+
 		underlaySpr = new FlxSprite().makeGraphic(1, 1, FlxColor.WHITE);
 		underlaySpr.color = FlxColor.BLACK;
 		underlaySpr.alpha = 0;
 		underlaySpr.scrollFactor.set();
-		
+
 		splashLayer.add(grpSusSplashes);
 		splashLayer.add(grpNoteSplashes);
 		
@@ -178,7 +178,7 @@ class PlayField extends FlxTypedContainer<StrumNote>
 		this.onNoteMiss.add(noteMiss);
 		this.onMissPress.add(noteMissPress);
 	}
-	
+
 	override function draw()
 	{
 		if (underlaySpr.exists && ClientPrefs.underlayOpacity > 0 && ClientPrefs.underlayType == FIELD)
@@ -240,7 +240,7 @@ class PlayField extends FlxTypedContainer<StrumNote>
 		
 		super.draw();
 	}
-	
+
 	public function clearReceptors()
 	{
 		while (members.length > 0)
@@ -380,7 +380,7 @@ class PlayField extends FlxTypedContainer<StrumNote>
 			{
 				if (note.wasGoodHit || field.autoPlayed && (note.ignoreNote || note.hitCausesMiss || note.canMiss)) return;
 				
-				if (ClientPrefs.hitsoundVolume > 0 && !note.hitsoundDisabled) FlxG.sound.play(Paths.sound('hitsound'), ClientPrefs.hitsoundVolume);
+				if (ClientPrefs.hitsoundVolume > 0 && !note.hitsoundDisabled) FlxG.sound.play(Paths.sound('hitsound-${ClientPrefs.hitsoundType}'), ClientPrefs.hitsoundVolume);
 				
 				if (note.hitCausesMiss)
 				{
@@ -585,7 +585,7 @@ class PlayField extends FlxTypedContainer<StrumNote>
 	public function spawnSusSplash(note:Note, isPlayer:Bool = false):SustainSplash
 	{
 		if ((ClientPrefs.noteSplashType == "Both" || ClientPrefs.noteSplashType == "Hold Covers")
-			&& _skin?.sustainSplashes
+			&& _skin?.sustainSplashes 
 			&& note.tail.length > 0)
 		{
 			final strum:Null<StrumNote> = note.playField.members[note.noteData];
@@ -628,7 +628,7 @@ class PlayField extends FlxTypedContainer<StrumNote>
 		
 		onMissPress.removeAll();
 		onMissPress.destroy();
-		
+
 		underlaySpr.destroy();
 		
 		super.destroy();

@@ -168,8 +168,7 @@ class PlayState extends MusicBeatState
 	 * Disables automatic camera movements if enabled.
 	 */
 	public var isCameraOnForcedPos:Bool = false;
-	
-	public var cameraLerping:Bool = true;
+	public var updateCamOffsets:Bool = true;
 	
 	/**
 	 * Container of all boyfriend's used in the state
@@ -260,6 +259,17 @@ class PlayState extends MusicBeatState
 	 * Target the game camera follows
 	 */
 	var camFollow:FlxObject;
+
+	var camFollowOffset:FlxPoint;
+	var camFollowOffsetTween:FlxTween;
+
+	var camFollowPoint:FlxPoint;
+	var camFollowTween:FlxTween;
+
+	private var camZoomTween:FlxTween;
+	private var uiZoomTween:FlxTween;
+	private var camZoomAdjustTween:FlxTween;
+	private var uiZoomAdjustTween:FlxTween;
 	
 	/**
 	 * Previous cameras target. used in story mode for a more seamless transition
@@ -380,6 +390,7 @@ class PlayState extends MusicBeatState
 	public static var deathCounter:Int = 0;
 	
 	public var defaultCamZoomAdd:Float = 0;
+	public var defaultHudZoomAdd:Float = 0;
 	
 	/**
 	 * Default camera zoom the game will attempt to return to.
@@ -472,6 +483,11 @@ class PlayState extends MusicBeatState
 	// Debug buttons
 	var debugKeysChart:Array<FlxKey>;
 	var debugKeysCharacter:Array<FlxKey>;
+
+	/**
+	 * once set to a target, the camera will only follow them.
+	 */
+	public var camCurTarget:Null<Character> = null;
 	
 	public var playHUD(get, never):Null<BaseHUD>;
 	
@@ -514,7 +530,6 @@ class PlayState extends MusicBeatState
 		if (file == null) return;
 		
 		defaultCamZoom = file.defaultZoom;
-		FlxG.camera.zoom = file.defaultZoom;
 		
 		if (file.camera_speed != null) cameraSpeed = file.camera_speed;
 		
@@ -681,18 +696,16 @@ class PlayState extends MusicBeatState
 		scripts.set('boyfriend', boyfriend);
 		scripts.set('boyfriendGroup', boyfriendGroup);
 		
-		var camPos:FlxPoint = FlxPoint.get(girlfriendCameraOffset[0], girlfriendCameraOffset[1]);
-		if (gf != null)
-		{
-			camPos.x += gf.getGraphicMidpoint().x + gf.cameraPosition[0];
-			camPos.y += gf.getGraphicMidpoint().y + gf.cameraPosition[1];
-		}
-		else
-		{
-			camPos.set(opponentCameraOffset[0], opponentCameraOffset[1]);
-			camPos.x += dad.getGraphicMidpoint().x + dad.cameraPosition[0];
-			camPos.y += dad.getGraphicMidpoint().y + dad.cameraPosition[1];
-		}
+		var camPos:FlxPoint = new FlxPoint(
+			FlxMath.lerp(
+				getCharacterCameraPos(dad).x,
+				getCharacterCameraPos(boyfriend).x, 0.5
+			),
+			FlxMath.lerp(
+				getCharacterCameraPos(dad).y,
+				getCharacterCameraPos(boyfriend).y, 0.5
+			)
+		);
 		
 		if (dad.curCharacter.startsWith('gf'))
 		{
@@ -725,19 +738,23 @@ class PlayState extends MusicBeatState
 		
 		modManager = new ModManager(this);
 		
-		camFollow = new FlxObject(camPos.x, camPos.y, 1, 1);
+		camFollow = new FlxObject();
 		add(camFollow);
-		camPos.put();
+
+		camFollowOffset = new FlxPoint();
+		camFollowPoint = new FlxPoint(camPos.x, camPos.y);
 		
 		if (prevCameraScroll != null)
 		{
-			camFollow.setPosition(prevCameraScroll.x, prevCameraScroll.y);
+			camFollowPoint.set(prevCameraScroll.x, prevCameraScroll.y);
 			prevCameraScroll = FlxDestroyUtil.put(prevCameraScroll);
 		}
 		
-		FlxG.camera.follow(camFollow, LOCKON, 0);
+		FlxG.camera.follow(camFollow, LOCKON);
 		FlxG.camera.zoom = defaultCamZoom;
 		FlxG.camera.snapToTarget();
+
+		FlxG.camera.focusOn(camFollow.getPosition());
 		
 		FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
 		
@@ -895,7 +912,7 @@ class PlayState extends MusicBeatState
 			playFields.add(strums);
 			
 			strums.onNoteHit.add((note, field) -> {
-				if (field.ID == 1) camZooming = true;
+				if (field.ID == 1 && !camZooming) camZooming = true;
 				
 				if (field.playerControls || (!audio.splitVocals && !audio.trackSwap)) audio.hit();
 				
@@ -1612,13 +1629,14 @@ class PlayState extends MusicBeatState
 	
 	override public function update(elapsed:Float):Void
 	{
-		if (cameraLerping && !inCutscene)
-		{
-			final lerpRate = 0.04 * cameraSpeed * playbackRate;
-			FlxG.camera.followLerp = lerpRate;
-		}
-		
 		if (generatedMusic && !endingSong && !isCameraOnForcedPos) moveCameraSection();
+
+		if (updateCamOffsets) updateCameraOffsets(camCurTarget);
+
+		camFollow.setPosition(camFollowPoint.x + camFollowOffset.x, camFollowPoint.y + camFollowOffset.y);
+
+		FlxG.camera.zoom = defaultCamZoom + defaultCamZoomAdd;
+		camHUD.zoom = defaultHudZoom + defaultHudZoomAdd;
 		
 		super.update(elapsed);
 		input.update();
@@ -1657,13 +1675,6 @@ class PlayState extends MusicBeatState
 		Conductor.visualPosition = getVisualPosition();
 		
 		checkEventNote();
-		
-		if (camZooming)
-		{
-			@:privateAccess if (!FlxTween.globalManager.containsTweensOf(FlxG.camera,
-				['zoom'])) FlxG.camera.zoom = MathUtil.decayLerp(FlxG.camera.zoom, defaultCamZoom + defaultCamZoomAdd, 6.25 * camZoomingDecay, elapsed);
-			@:privateAccess if (!FlxTween.globalManager.containsTweensOf(camHUD, ['zoom'])) camHUD.zoom = MathUtil.decayLerp(camHUD.zoom, defaultHudZoom, 6.25 * camZoomingDecay, elapsed);
-		}
 		
 		if (!ClientPrefs.noReset && controls.RESET && canReset && !inCutscene && startedCountdown && !endingSong) health = 0;
 		
@@ -2067,12 +2078,11 @@ class PlayState extends MusicBeatState
 					if (Math.isNaN(camZoom)) camZoom = 0.015;
 					if (Math.isNaN(hudZoom)) hudZoom = 0.03;
 					
-					FlxG.camera.zoom += camZoom;
-					camHUD.zoom += hudZoom;
+					uiBop(camZoom, hudZoom, 0.8);
 				}
 				
 			case 'Camera Zoom':
-				FlxTween.cancelTweensOf(FlxG.camera, ['zoom']);
+				if (camZoomTween != null) camZoomTween.cancel();
 				
 				var val1:Float = Std.parseFloat(value1);
 				if (Math.isNaN(val1)) val1 = 1;
@@ -2087,10 +2097,9 @@ class PlayState extends MusicBeatState
 					if (split[1] != null) leEase = split[1].trim();
 					if (Math.isNaN(duration)) duration = 0;
 					
-					if (duration > 0) FlxTween.tween(FlxG.camera, {zoom: targetZoom}, duration, {ease: FlxEase.circOut});
-					else FlxG.camera.zoom = targetZoom;
+					if (duration > 0) camZoomTween = FlxTween.tween(this, {defaultCamZoom: targetZoom}, duration, {ease: FlxEase.circOut});
+					else defaultCamZoom = targetZoom;
 				}
-				defaultCamZoom = targetZoom;
 				scripts.set('defaultCamZoom', defaultCamZoom);
 				
 			case 'HUD Fade':
@@ -2148,12 +2157,9 @@ class PlayState extends MusicBeatState
 				if (Math.isNaN(val2)) val2 = 0;
 				
 				isCameraOnForcedPos = false;
+				updateCamOffsets = true;
 				if (!Math.isNaN(Std.parseFloat(value1)) || !Math.isNaN(Std.parseFloat(value2)))
-				{
-					camFollow.x = val1;
-					camFollow.y = val2;
-					isCameraOnForcedPos = true;
-				}
+					focusCamera("position", val1, val2, 1.9, "CLASSIC", true);
 				
 			case 'Alt Idle Animation':
 				var char:Character = dad;
@@ -2290,7 +2296,7 @@ class PlayState extends MusicBeatState
 				}
 				
 			case 'Set Cam Zoom':
-				defaultCamZoom = Std.parseFloat(value1);
+				camChangeZoom(Std.parseFloat(value1), 1.9, FlxEase.expoOut);
 				
 			case 'Set Cam Pos':
 				var split:Array<String> = value1.split(',');
@@ -2322,9 +2328,129 @@ class PlayState extends MusicBeatState
 				{
 					Logger.log('Event [Set Property] failed Exception: ${e.toString()}', ERROR);
 				}
+
+			// New Stuff
+			case 'Focus Camera':	
+				var eventData:Array<String> = value2.split(',');
+
+				focusCamera(value1, Std.parseFloat(eventData[0]), Std.parseFloat(eventData[1]), Conductor.stepCrotchet * Std.parseFloat(eventData[2]) / 1000, eventData[3], true);
+
+			case 'Zoom Camera':	
+				var eventData:Array<String> = value2.split(',');
+
+				var targetZoom = Std.parseFloat(eventData[0]) * ((value1.toLowerCase() == "absolute" || value1.toLowerCase() == "direct") ? FlxCamera.defaultZoom : stage.stageData.defaultZoom);
+
+				if (eventData[2].toLowerCase() == 'instant') defaultCamZoom = targetZoom;
+				else camChangeZoom(targetZoom, Conductor.stepCrotchet * Std.parseFloat(eventData[1]) / 1000, CoolUtil.getEaseFromString(eventData[2]));
+
+			case 'Set Camera Bop':
+				if(ClientPrefs.camZooms) {
+					if(value1 == null) value1 = "4";
+					if(value2 == null) value2 = "1";
+
+					beatsPerZoom = Std.parseInt(value1);
+					camZoomingMult = Std.parseFloat(value2);
+				}
 		}
 		
 		dispatchEvent('onEvent', EventCache.get(EvNoteEvent).recycle(event));
+	}
+
+	public function focusCamera(target:String = 'boyfriend', X:Float = 0, Y:Float = 0, Time:Float = 1, ease:String = 'linear', lockPos:Bool = true, ?onComplete:Null<TweenCallback> = null)
+	{
+		var positionData:FlxPoint = FlxPoint.get(0, 0);
+		positionData.put();
+		
+		switch(target.toLowerCase())
+		{
+			case 'bf', 'boyfriend', 'player', "0":
+				positionData = getCharacterCameraPos((playerStrums != null) ? playerStrums.owner : boyfriend);
+
+				positionData.x += X;
+				positionData.y += Y;
+
+				camCurTarget = (playerStrums != null) ? playerStrums.owner : boyfriend;
+			case 'dad', 'opponent', "1":
+				positionData = getCharacterCameraPos((opponentStrums != null) ? opponentStrums.owner : dad);
+
+				positionData.x += X;
+				positionData.y += Y;
+
+				camCurTarget = (opponentStrums != null) ? opponentStrums.owner : dad;
+			case 'girlfriend', 'gf', "2":
+				positionData = getGFCameraPos();
+
+				positionData.x += X;
+				positionData.y += Y;
+
+				camCurTarget = gf;
+			case 'position', "-1":
+				positionData.x = X;
+				positionData.y = Y;
+			
+		}
+
+		updateCamOffsets = (target.toLowerCase() != "position");
+
+		if(onComplete == null){
+			onComplete = function(tween:FlxTween){};
+		}
+
+		if (ease.toLowerCase() == 'classic')
+		{
+			if(camFollow != null)
+			{
+				isCameraOnForcedPos = false;
+				if (!Math.isNaN(X) || !Math.isNaN(Y))
+				{
+					isCameraOnForcedPos = lockPos;
+
+					if (!Math.isNaN(X)) X = 0;
+					if (!Math.isNaN(Y)) Y = 0;
+
+					if (camFollowTween != null) camFollowTween.cancel();
+					
+					camFollowTween = FlxTween.tween(camFollowPoint, {
+						x: positionData.x,
+						y: positionData.y
+					}, 1.9 / (cameraSpeed * playbackRate), {ease: FlxEase.expoOut, onComplete: onComplete});
+				}
+			}
+		}
+		else if (ease.toLowerCase() == 'instant')
+		{  
+			if(camFollow != null)
+			{
+				isCameraOnForcedPos = false;
+				if (!Math.isNaN(X) || !Math.isNaN(Y))
+				{
+					snapCamToPos(positionData.x, positionData.y, lockPos);
+				}
+			}
+		}
+		else
+		{
+			if (camFollow != null)
+			{
+				isCameraOnForcedPos = false;
+				if (!Math.isNaN(X) || !Math.isNaN(Y))
+				{
+					isCameraOnForcedPos = lockPos;
+					if (!Math.isNaN(X)) X = 0;
+					if (!Math.isNaN(Y)) Y = 0;
+
+					if (camFollowTween != null) camFollowTween.cancel();
+
+					camFollowTween = FlxTween.tween(camFollowPoint, {
+						x: positionData.x, 
+						y: positionData.y
+					}, Time, {
+						ease: CoolUtil.getEaseFromString(ease),
+						onComplete: onComplete
+					});
+				}
+			}
+		}
 	}
 	
 	function moveCameraSection():Void
@@ -2340,23 +2466,23 @@ class PlayState extends MusicBeatState
 				return;
 			}
 			
-			camFollow.setPosition(gf.getMidpoint().x, gf.getMidpoint().y);
-			camFollow.x += gf.cameraPosition[0] + girlfriendCameraOffset[0];
-			camFollow.y += gf.cameraPosition[1] + girlfriendCameraOffset[1];
-			
-			if (ClientPrefs.camFollowsCharacters)
-			{
-				final displacement = gf.getSingDisplacement();
-				
-				camFollow.x += displacement.x;
-				camFollow.y += displacement.y;
-				
-				displacement.putWeak();
-			}
+			focusCamera("gf", 0, 0, 4, "CLASSIC", false);
 			return;
 		}
 		
-		moveCamera(!SONG.notes[curSection].mustHitSection);
+		var isDad:Bool = !SONG.notes[curSection].mustHitSection;
+		
+		if (opponentStrums != null && playerStrums != null) camCurTarget = isDad ? opponentStrums.owner : playerStrums.owner;
+		else camCurTarget = isDad ? dad : boyfriend;
+		
+		var event = dispatchEvent('onMoveCamera', EventCache.get(MoveCameraEvent).recycle(camCurTarget, isDad ? 'dad' : 'boyfriend'));
+		
+		if (event.cancelled)
+		{
+			return;
+		}
+
+		focusCamera(isDad ? "dad" : "boyfriend", 0, 0, 4, "CLASSIC", false);
 	}
 	
 	override function dispatchEvent<T:BasicEvent>(func:String, event:T, immutablePropogation:Bool = false):T
@@ -2398,37 +2524,41 @@ class PlayState extends MusicBeatState
 		return desiredPos;
 	}
 	
-	public function moveCamera(isDad:Bool):Void
+	public function getGFCameraPos():FlxPoint
 	{
-		var desiredPos:Null<FlxPoint> = null;
-		var curCharacter:Null<Character> = null;
+		if (gf == null) return FlxPoint.weak();
 		
-		if (opponentStrums != null && playerStrums != null) curCharacter = isDad ? opponentStrums.owner : playerStrums.owner;
-		else curCharacter = isDad ? dad : boyfriend;
+		final desiredPos = gf.getMidpoint();
 		
-		var event = dispatchEvent('onMoveCamera', EventCache.get(MoveCameraEvent).recycle(curCharacter, isDad ? 'dad' : 'boyfriend'));
+		desiredPos.y += -100 + gf.cameraPosition[1] + girlfriendCameraOffset[1];
 		
-		if (event.cancelled)
-		{
-			return;
-		}
+		if (gf.isPlayer) desiredPos.x -= 100 + gf.cameraPosition[0];
+		else desiredPos.x += 100 + gf.cameraPosition[0];
+
+		desiredPos.x += girlfriendCameraOffset[0];
 		
-		desiredPos = getCharacterCameraPos(curCharacter);
-		
-		camFollow.x = desiredPos.x;
-		camFollow.y = desiredPos.y;
-		
+		return desiredPos;
+	}
+	
+	function updateCameraOffsets(char:Character)
+	{
 		if (ClientPrefs.camFollowsCharacters)
 		{
-			final displacement = curCharacter.getSingDisplacement();
+			final displacement = char.getSingDisplacement();
 			
-			camFollow.x += displacement.x;
-			camFollow.y += displacement.y;
+			if (camFollowOffsetTween != null)
+				camFollowOffsetTween.cancel();
+
+			camFollowOffsetTween = FlxTween.tween(camFollowOffset, {
+				x: displacement.x,
+				y: displacement.y
+			}, 1.4 / (cameraSpeed * playbackRate), {ease: FlxEase.expoOut, onComplete: function(twn:FlxTween) {
+					camFollowOffsetTween = null;
+				}
+			});
 			
 			displacement.putWeak();
 		}
-		
-		desiredPos.put();
 	}
 	
 	/**
@@ -2437,9 +2567,67 @@ class PlayState extends MusicBeatState
 	 */
 	function snapCamToPos(x:Float = 0, y:Float = 0, lockPosition:Bool = false):Void
 	{
-		camFollow.setPosition(x, y);
-		FlxG.camera.snapToTarget();
+		if (camFollowTween != null) camFollowTween.cancel();
+		camFollowPoint.set(x, y);
 		if (lockPosition) isCameraOnForcedPos = true;
+	}
+
+	public function camChangeZoom(zoom:Float, time:Float, ?ease:Null<flixel.tweens.EaseFunction>, ?onComplete:Null<TweenCallback> = null):Void
+	{
+		if(onComplete == null) onComplete = function(tween:FlxTween){};
+		
+		if (camZoomTween != null) camZoomTween.cancel();
+		if(time > 0) camZoomTween = FlxTween.tween(this, {defaultCamZoom: zoom}, time, {ease: ease, onComplete: onComplete});
+		else defaultCamZoom = zoom;
+	}
+
+	public function uiChangeZoom(zoom:Float, time:Float, ?ease:Null<flixel.tweens.EaseFunction>, ?onComplete:Null<TweenCallback> = null):Void{
+
+		if(onComplete == null) onComplete = function(tween:FlxTween){};
+		
+		if (uiZoomTween != null) uiZoomTween.cancel();
+
+		if(time > 0) uiZoomTween = FlxTween.tween(this, {defaultHudZoom: zoom}, time, {ease: ease, onComplete: onComplete});
+		else defaultHudZoom = zoom;
+	}
+
+	public function camChangeZoomAdjust(zoom:Float, time:Float, ?ease:Null<flixel.tweens.EaseFunction>, ?onComplete:Null<TweenCallback> = null):Void
+	{
+		if(onComplete == null) onComplete = function(tween:FlxTween){};
+		
+		if (camZoomAdjustTween != null) camZoomAdjustTween.cancel();
+
+		if(time > 0) camZoomAdjustTween = FlxTween.tween(this, {defaultCamZoomAdd: zoom}, time, {ease: ease, onComplete: onComplete});
+		else defaultCamZoomAdd = zoom;
+	}
+
+	public function uiChangeZoomAdjust(zoom:Float, time:Float, ?ease:Null<flixel.tweens.EaseFunction>, ?onComplete:Null<TweenCallback> = null):Void
+	{
+		if(onComplete == null) onComplete = function(tween:FlxTween){};
+		
+		if (uiZoomAdjustTween != null) uiZoomAdjustTween.cancel();
+
+		if(time > 0) uiZoomAdjustTween = FlxTween.tween(this, {defaultHudZoomAdd: zoom}, time, {ease: ease, onComplete: onComplete});
+		else defaultHudZoomAdd = zoom;
+	}
+
+	public function uiBop(?camZoom:Float = 0.01, ?uiZoom:Float = 0.02, ?time:Float = 0.6, ?ease:Null<flixel.tweens.EaseFunction>)
+	{
+		if (!ClientPrefs.camZooms) return;
+
+		if (ease == null) ease = FlxEase.quintOut;
+		
+		if (camZoomAdjustTween != null) camZoomAdjustTween.cancel();
+		if (uiZoomAdjustTween != null) uiZoomAdjustTween.cancel();
+
+		defaultCamZoomAdd += camZoom;
+		defaultHudZoomAdd += uiZoom;
+
+		if (camZooming)
+		{
+			camChangeZoomAdjust(0, time, ease);
+			uiChangeZoomAdjust(0, time, ease);
+		}
 	}
 	
 	public function finishSong(ignoreNoteOffset:Bool = false):Void
@@ -2547,7 +2735,7 @@ class PlayState extends MusicBeatState
 					FlxTransitionableState.skipNextTransIn = true;
 					FlxTransitionableState.skipNextTransOut = true;
 					
-					prevCameraScroll = new FlxPoint(camFollow.x, camFollow.y);
+					prevCameraScroll = new FlxPoint(camFollowPoint.x, camFollowPoint.y);
 					
 					final difficulty:String = Difficulty.getDifficultyFilePath();
 					final songLowercase = Paths.sanitize(storyMeta.playlist[0].toLowerCase());
@@ -2855,13 +3043,7 @@ class PlayState extends MusicBeatState
 		
 		if (beatsPerZoom == 0) beatsPerZoom = 4;
 		
-		if (camZooming && ClientPrefs.camZooms && curBeat % beatsPerZoom == 0)
-		{
-			@:privateAccess if (!FlxTween.globalManager.containsTweensOf(FlxG.camera, ['zoom'])) // makes it so tweening the camera zoom won't glitch out when it bops every section
-				FlxG.camera.zoom += 0.015 * camZoomingMult;
-			@:privateAccess if (!FlxTween.globalManager.containsTweensOf(camHUD, ['zoom'])) // just in case
-				camHUD.zoom += 0.03 * camZoomingMult;
-		}
+		if(camZooming && curBeat % beatsPerZoom == 0) uiBop(0.015 * camZoomingMult, 0.03 * camZoomingMult, 0.8);
 		
 		lastBeatHit = curBeat;
 		
