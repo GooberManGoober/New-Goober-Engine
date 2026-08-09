@@ -2611,14 +2611,12 @@ class PlayState extends MusicBeatState
 		
 		final desiredPos = gf.getMidpoint();
 		
-		final offsets = girlfriendCameraOffset;
-		
-		desiredPos.y += -100 + gf.cameraPosition[1] + offsets[1];
+		desiredPos.y += -100 + gf.cameraPosition[1] + girlfriendCameraOffset[1];
 		
 		if (gf.isPlayer) desiredPos.x -= 100 + gf.cameraPosition[0];
 		else desiredPos.x += 100 + gf.cameraPosition[0];
 
-		desiredPos.x += offsets[0];
+		desiredPos.x += girlfriendCameraOffset[0];
 		
 		return desiredPos;
 	}
