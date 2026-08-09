@@ -2345,11 +2345,8 @@ class PlayState extends MusicBeatState
 
 			case 'Set Camera Bop':
 				if(ClientPrefs.camZooms) {
-					if(value1 == null) value1 = "4";
-					if(value2 == null) value2 = "1";
-
-					beatsPerZoom = Std.parseInt(value1);
-					camZoomingMult = Std.parseFloat(value2);
+					beatsPerZoom = value1 != null ? Std.parseInt(value1) : 4;
+					camZoomingMult = value2 != null ? Std.parseFloat(value2) : 1;
 				}
 		}
 		

@@ -50,7 +50,7 @@ import funkin.states.*;
 import funkin.objects.*;
 import funkin.objects.note.*;
 import funkin.states.editors.ui.*;
-import funkin.backend.MusicBeatSubstate;
+import funkin.backend.MusicBeatSubState;
 import funkin.states.editors.ui.ChartEditorKit;
 import funkin.audio.SyncedFlxSoundGroup;
 
@@ -2141,7 +2141,7 @@ class ChartEditorState extends haxe.ui.backend.flixel.UIState
 			}
 		}
 		
-		var note:EditorNote = new EditorNote(daStrumTime, intendedData % song.keys, null, null, true);
+		var note:EditorNote = new EditorNote(daStrumTime, intendedData % song.keys, null, false, true);
 		note.lane = Std.int(Math.max(Math.floor(intendedData / song.keys), 0));
 		note.noteData = intendedData % song.keys;
 		note.alreadyShifted = true;
@@ -2647,7 +2647,7 @@ class AttachedFlxText extends FlxText
 	}
 }
 
-class ChartingOptionsSubmenu extends MusicBeatSubstate
+class ChartingOptionsSubmenu extends MusicBeatSubState
 {
 	var grpMenuShit:FlxTypedGroup<Alphabet>;
 	var menuItems:Array<String> = [

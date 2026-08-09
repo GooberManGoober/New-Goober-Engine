@@ -122,6 +122,7 @@ class MasterEditorMenu extends MusicBeatState
 					FlxG.switchState(() -> new ChartConverterState());
 				case 'Metadata Editor':
 					openSubState(new SongMetaEditor());
+					muteMusic = false;
 					persistentUpdate = false; // makes it so you can't scroll through the options while in this substate
 				case 'Mods Manager':
 					FlxG.switchState(() -> new ModsState());
@@ -179,7 +180,8 @@ class MasterEditorMenu extends MusicBeatState
 		if (directories[curDirectory] == null || directories[curDirectory].length < 1) directoryTxt.text = '< No Mod Directory Loaded >';
 		else
 		{
-			Mods.currentModDirectory = directories[curDirectory];
+			Mods.changeModDirectory(directories[curDirectory]);
+			
 			directoryTxt.text = '< Loaded Mod Directory: ' + Mods.currentModDirectory + ' >';
 		}
 		directoryTxt.text = directoryTxt.text.toUpperCase();

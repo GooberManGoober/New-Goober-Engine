@@ -22,6 +22,8 @@ class Init extends FlxState
 		funkin.input.Controls.init();
 		
 		ClientPrefs.load();
+
+		funkin.data.ModPrefs.init();
 		
 		funkin.data.Highscore.load();
 		
@@ -55,6 +57,8 @@ class Init extends FlxState
 		FlxG.autoPause = ClientPrefs.autoPause;
 		
 		funkin.scripts.FunkinScript.init();
+
+		funkin.scripting.EventCache.init();
 		
 		// ready backends
 		funkin.backend.plugins.HotReloadPlugin.init();

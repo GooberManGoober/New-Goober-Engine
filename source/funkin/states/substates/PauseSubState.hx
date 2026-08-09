@@ -18,18 +18,18 @@ import flixel.util.FlxStringUtil;
 import funkin.backend.Difficulty;
 import funkin.utils.CameraUtil;
 import funkin.states.options.OptionsState;
-import funkin.backend.MusicBeatSubstate;
+import funkin.backend.MusicBeatSubState;
 import funkin.data.*;
 import funkin.states.*;
 import funkin.objects.*;
 import funkin.scripts.*;
 
-class PauseSubState extends MusicBeatSubstate
+class PauseSubState extends MusicBeatSubState
 {
+	public static var instance:PauseSubState;
+	
 	var grpMenuShit:FlxTypedGroup<Alphabet>;
 	var cornerTexts:Array<FlxText> = [];
-	
-	public static var instance:PauseSubState;
 	
 	var menuItems:Array<String> = [];
 	var menuItemsOG:Array<String> = ['Resume', 'Restart Song', 'Change Difficulty', 'Options', 'Exit to menu'];
@@ -170,7 +170,7 @@ class PauseSubState extends MusicBeatSubstate
 		
 		super.create();
 		
-		scriptGroup.call('onCreatePost', []);
+		stateScripts.call('onCreatePost');
 	}
 	
 	var holdTime:Float = 0;
@@ -312,7 +312,7 @@ class PauseSubState extends MusicBeatSubstate
 	
 	public function returnToMain()
 	{
-		if (scriptGroup.call('onExit', []) != ScriptConstants.STOP_FUNC)
+		if (!stateScripts.event('onExit', EventCache.get(BasicEvent).basicRecycle()).cancelled)
 		{
 			PlayState.deathCounter = 0;
 			PlayState.seenCutscene = false;
@@ -326,7 +326,7 @@ class PauseSubState extends MusicBeatSubstate
 	
 	public function toOptions()
 	{
-		if (scriptGroup.call('onOptions', []) != ScriptConstants.STOP_FUNC)
+		if (!stateScripts.event('onOptions', EventCache.get(BasicEvent).basicRecycle()).cancelled)
 		{
 			PlayState.instance.paused = true;
 			PlayState.instance.audio.volume = 0;
@@ -346,7 +346,7 @@ class PauseSubState extends MusicBeatSubstate
 	
 	public function restartSong(noTrans:Bool = false)
 	{
-		if (scriptGroup.call('onRestart', []) != ScriptConstants.STOP_FUNC)
+		if (!stateScripts.event('onRestart', EventCache.get(BasicEvent).basicRecycle()).cancelled)
 		{
 			PlayState.instance.paused = true;
 			FlxG.sound.music.volume = 0;
@@ -364,7 +364,7 @@ class PauseSubState extends MusicBeatSubstate
 	override function destroy()
 	{
 		pauseMusic.destroy();
-		scriptGroup.call('onDestroy', []);
+		stateScripts.call('onDestroy');
 		
 		super.destroy();
 	}
@@ -373,26 +373,30 @@ class PauseSubState extends MusicBeatSubstate
 	{
 		curSelected = FlxMath.wrap(curSelected + change, 0, menuItems.length - 1);
 		
-		var ret = scriptGroup.call('onChangeSelection', [curSelected]);
+		var ev = stateScripts.event('onChangeSelection', EventCache.get(IntEvent).recycle(curSelected));
 		
-		if (ret != ScriptConstants.STOP_FUNC)
+		if (ev.cancelled)
 		{
-			FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+			return;
+		}
+		
+		curSelected = ev.value;
+		
+		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+		
+		for (k => item in grpMenuShit.members)
+		{
+			item.targetY = k - curSelected;
 			
-			for (k => item in grpMenuShit.members)
+			item.alpha = 0.6;
+			if (item.targetY == 0)
 			{
-				item.targetY = k - curSelected;
+				item.alpha = 1;
 				
-				item.alpha = 0.6;
-				if (item.targetY == 0)
+				if (item == skipTimeTracker)
 				{
-					item.alpha = 1;
-					
-					if (item == skipTimeTracker)
-					{
-						curTime = Math.max(0, Conductor.songPosition);
-						updateSkipTimeText();
-					}
+					curTime = Math.max(0, Conductor.songPosition);
+					updateSkipTimeText();
 				}
 			}
 		}
@@ -448,7 +452,7 @@ class PauseSubState extends MusicBeatSubstate
 		}
 		curSelected = 0;
 		changeSelection();
-		scriptGroup.call('onRegenMenu', []);
+		stateScripts.call('onRegenMenu');
 	}
 	
 	function updateSkipTextStuff()
