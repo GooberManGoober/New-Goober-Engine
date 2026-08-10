@@ -2353,6 +2353,8 @@ class PlayState extends MusicBeatState
 		dispatchEvent('onEvent', EventCache.get(EvNoteEvent).recycle(event));
 	}
 
+	// TODO: Make this function not use camCurTarget
+	
 	public function focusCamera(target:String = 'boyfriend', X:Float = 0, Y:Float = 0, Time:Float = 1, ease:String = 'linear', lockPos:Bool = true, ?onComplete:Null<TweenCallback> = null)
 	{
 		var positionData:FlxPoint = FlxPoint.get(0, 0);
