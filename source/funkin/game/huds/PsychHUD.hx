@@ -61,7 +61,7 @@ class PsychHUD extends BaseHUD
 		
 		final healthGraphic = #if MODS_ALLOWED FunkinAssets.exists(Paths.mods('images/${Paths.UI_PREFIX}healthBar')) ? '${Paths.UI_PREFIX}healthBar' : #end 'UI/healthBar';
 		
-				healthBar = new Bar(0, FlxG.height * (!ClientPrefs.downScroll ? 0.89 : 0.11), healthGraphic, function() return parent.health, FunkinConstants.HEALTH_MIN, FunkinConstants.HEALTH_MAX);
+				healthBar = new Bar(0, FlxG.height * (!ClientPrefs.downScroll ? 0.89 : 0.11), healthGraphic, function() return healthLerp, FunkinConstants.HEALTH_MIN, FunkinConstants.HEALTH_MAX);
 		healthBar.screenCenter(X);
 		healthBar.leftToRight = false;
 		healthBar.scrollFactor.set();

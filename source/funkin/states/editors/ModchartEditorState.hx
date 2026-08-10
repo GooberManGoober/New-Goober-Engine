@@ -8,6 +8,10 @@ import openfl.Lib;
 
 class ModchartEditorState extends UIState
 {
+    /**
+     * I do actually want to make this a real editor, but because I have no idea how it should look/behave, it's just a joke state for now
+    */
+    
     override function create()
     {
         super.create();
