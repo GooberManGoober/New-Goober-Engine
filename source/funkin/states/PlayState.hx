@@ -1910,7 +1910,6 @@ class PlayState extends MusicBeatState
 	
 	function openPauseMenu():Void
 	{
-		FlxG.camera.followLerp = 0;
 		persistentUpdate = false;
 		persistentDraw = true;
 		paused = true;
@@ -1923,8 +1922,6 @@ class PlayState extends MusicBeatState
 	
 	function openChartEditor():Void
 	{
-		FlxG.camera.followLerp = 0;
-		
 		persistentUpdate = false;
 		paused = true;
 		CoolUtil.cancelMusicFadeTween();
@@ -1938,8 +1935,6 @@ class PlayState extends MusicBeatState
 	
 	function openCharacterEditor():Void
 	{
-		FlxG.camera.followLerp = 0;
-		
 		persistentUpdate = false;
 		paused = true;
 		CoolUtil.cancelMusicFadeTween();
