@@ -773,7 +773,7 @@ class PlayState extends MusicBeatState
 		initAllScriptsInDirectory('songs/${Paths.sanitize(SONG.song)}/');
 		initAllScriptsInDirectory('songs/${Paths.sanitize(SONG.song)}/scripts/');
 		
-		scripts.call('preNoteGeneration');
+		dispatchEvent('preNoteGeneration', EventCache.get(BasicEvent).basicRecycle());
 		
 		if (genNotesBeforeCountdown) generatePlayfields();
 		generateSong(SONG.song);
@@ -903,8 +903,9 @@ class PlayState extends MusicBeatState
 			final auto = (lane != 0 || cpuControlled);
 			
 			var strums = new PlayField(0, 0, SONG.keys, character, isPlayer, auto, lane, arrowSkins[lane]);
-			// strums.scale = NoteUtil.getSkinFromID(lane).scale;
-			scripts.call('preReceptorGeneration', [strums, lane]);
+			
+			dispatchEvent('preReceptorGeneration', EventCache.get(ReceptorEvent).recycle(strums, lane));
+			
 			strums.generateReceptors();
 			strums.fadeIn(isStoryMode || skipArrowStartTween);
 			strums.ID = lane;
@@ -966,14 +967,14 @@ class PlayState extends MusicBeatState
 		modManager.keys = SONG.keys;
 		
 		generatedFields = true;
-		scripts.call('postReceptorGeneration');
+		dispatchEvent('postReceptorGeneration', EventCache.get(BasicEvent).basicRecycle());
 		
 		modManager.registerEssentialModifiers();
 		modManager.registerDefaultModifiers();
 		modManager.registerScriptedModifiers();
 		modifiersRegistered = true;
 		
-		scripts.call('postModifierRegister');
+		dispatchEvent('postModifierRegister', EventCache.get(BasicEvent).basicRecycle());
 	}
 	
 	var startTimer:FlxTimer = null;
@@ -987,7 +988,7 @@ class PlayState extends MusicBeatState
 	{
 		if (startedCountdown)
 		{
-			scripts.call('onStartCountdown');
+			dispatchEvent('onStartCountdown', EventCache.get(BasicEvent).basicRecycle());
 			return;
 		}
 		
@@ -1005,7 +1006,7 @@ class PlayState extends MusicBeatState
 			startedCountdown = true;
 			Conductor.songPosition = 0;
 			Conductor.songPosition -= Conductor.crotchet * 5;
-			scripts.call('onCountdownStarted');
+			dispatchEvent('onCountdownStarted', EventCache.get(BasicEvent).basicRecycle());
 			
 			var swagCounter:Int = 0;
 			
@@ -1151,7 +1152,7 @@ class PlayState extends MusicBeatState
 		if (automatedDiscord) DiscordClient.changePresence(rpcDescription, rpcSongName + ' ' + rpcDifficulty, null, true, songLength);
 		
 		scripts.set('songLength', songLength);
-		scripts.call('onSongStart');
+		dispatchEvent('onSongStart', EventCache.get(BasicEvent).basicRecycle());
 		
 		hud?.onSongStart();
 	}
@@ -1540,11 +1541,12 @@ class PlayState extends MusicBeatState
 			#end
 			
 			paused = false;
-			scripts.call('onResume');
+			dispatchEvent('onResume', EventCache.get(BasicEvent).basicRecycle());
 			
 			resetDiscordRPC(startTimer != null && startTimer.finished);
 		}
-		scripts.call('onSubStateClose');
+		dispatchEvent('onSubStateClose', EventCache.get(BasicEvent).basicRecycle());
+		
 		super.closeSubState();
 	}
 	
@@ -2992,7 +2994,7 @@ class PlayState extends MusicBeatState
 	{
 		instance = null;
 		
-		scripts.call('onDestroy', [], true);
+		scripts.call('onDestroy');
 		
 		scripts = FlxDestroyUtil.destroy(scripts);
 		eventScripts = FlxDestroyUtil.destroy(eventScripts);
