@@ -2439,17 +2439,33 @@ class PlayState extends MusicBeatState
 
 			// New Stuff
 			case 'Focus Camera':	
-				var eventData:Array<String> = value2.split(',');
+				var eventDataV1:Array<String> = value1.split(',');
+				var eventDataV2:Array<String> = value2.split(',');
 
-				focusCamera(value1, Std.parseFloat(eventData[0]), Std.parseFloat(eventData[1]), Conductor.stepCrotchet * Std.parseFloat(eventData[2]) / 1000, eventData[3], true);
+				var timeType:String = "A";
+				if (eventDataV1[1] != null) timeType = eventDataV1[1];
+
+				var timeValue:Float = 4;
+				if (timeType.toLowerCase().trim() == "a") timeValue = Conductor.stepCrotchet * Std.parseFloat(eventDataV2[2]) / 1000; // Steps
+				else if (timeType.toLowerCase().trim() == "b") timeValue = Std.parseFloat(eventDataV2[2]); // Seconds
+
+				focusCamera(eventDataV1[0], Std.parseFloat(eventDataV2[0]), Std.parseFloat(eventDataV2[1]), timeValue, eventDataV2[3], true);
 
 			case 'Zoom Camera':	
-				var eventData:Array<String> = value2.split(',');
+				var eventDataV1:Array<String> = value1.split(',');
+				var eventDataV2:Array<String> = value2.split(',');
 
-				var targetZoom = Std.parseFloat(eventData[0]) * ((value1.toLowerCase() == "absolute" || value1.toLowerCase() == "direct") ? FlxCamera.defaultZoom : stage.stageData.defaultZoom);
+				var timeType:String = "A";
+				if (eventDataV1[1] != null) timeType = eventDataV1[1];
 
-				if (eventData[2].toLowerCase() == 'instant') defaultCamZoom = targetZoom;
-				else camChangeZoom(targetZoom, Conductor.stepCrotchet * Std.parseFloat(eventData[1]) / 1000, CoolUtil.getEaseFromString(eventData[2]));
+				var timeValue:Float = 4;
+				if (timeType.toLowerCase().trim() == "a") timeValue = Conductor.stepCrotchet * Std.parseFloat(eventDataV2[1]) / 1000; // Steps
+				else if (timeType.toLowerCase().trim() == "b") timeValue = Std.parseFloat(eventDataV2[1]); // Seconds
+
+				var targetZoom = Std.parseFloat(eventDataV2[0]) * ((eventDataV1[0].toLowerCase() == "absolute" || eventDataV1[0].toLowerCase() == "direct") ? FlxCamera.defaultZoom : stage.stageData.defaultZoom);
+
+				if (eventDataV2[2].toLowerCase() == 'instant') defaultCamZoom = targetZoom;
+				else camChangeZoom(targetZoom, timeValue, CoolUtil.getEaseFromString(eventDataV2[2]));
 
 			case 'Set Camera Bop':
 				if(ClientPrefs.camZooms) {

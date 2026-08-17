@@ -33,16 +33,28 @@ class WindowUtil
 	/**
 	 * The current window width in pixels.
 	 */
-	public static var windowWidth(get, never):Int;
+	public static var windowWidth(get, set):Int;
 	
 	static inline function get_windowWidth():Int return FlxG.stage.window.width;
+
+	static inline function set_windowWidth(value:Int):Int
+	{
+		FlxG.stage.window.width = value;
+		return value;
+	}
 	
 	/**
 	 * The current window height in pixels.
 	 */
-	public static var windowHeight(get, never):Int;
+	public static var windowHeight(get, set):Int;
 	
 	static inline function get_windowHeight():Int return FlxG.stage.window.height;
+
+	static inline function set_windowHeight(value:Int):Int
+	{
+		FlxG.stage.window.height = value;
+		return value;
+	}
 	
 	/**
 	 * The current `x` position of the window on the screen.
@@ -121,6 +133,19 @@ class WindowUtil
 	static inline function set_maximized(value:Bool):Bool
 	{
 		FlxG.stage.window.maximized = value;
+		return value;
+	}
+
+	/**
+	 * Gets or sets the window's fullscreen state.
+	 */
+	public static var fullscreen(get, set):Bool;
+	
+	static inline function get_fullscreen():Bool return FlxG.stage.window.fullscreen;
+	
+	static inline function set_fullscreen(value:Bool):Bool
+	{
+		FlxG.stage.window.fullscreen = value;
 		return value;
 	}
 	
