@@ -177,7 +177,7 @@ class OLDChartEditorState extends MusicBeatState
 		],
 		[
 			"Focus Camera",
-			"Changes the camera target\n\nValue 1: Target (Player, Opponent, Girlfriend, Position)\nValue 2: X, Y, Time, Ease\n\nX, and Y Values will act an offset if the target isn't 'Position'\n\nTime & Ease will be ignored if the Ease type is either 'Classic' or 'Instant'"
+			"Changes the camera target\n\nValue 1: Target, Time Variant\nValue 2: X, Y, Time, Ease\n\nTarget Options are Player, Opponent, Girlfriend, Position\nTime Options are A (Steps) and B (Seconds), Defaults to A.\n\nX, and Y Values will act an offset if the target isn't 'Position'\n\nTime & Ease will be ignored if the Ease type is either 'Classic' or 'Instant'"
 		],
 		[
 			"Set Camera Bop",
@@ -185,7 +185,7 @@ class OLDChartEditorState extends MusicBeatState
 		],
 		[
 			"Zoom Camera",
-			"Changes the camera zoom\n\nValue 1: Zoom Type\nValue 2: New Zoom Value, Time, Ease.\n\nZoom Types:\n\nAbsolute: Set zoom directly.\nStage: Set zoom as a multiplier of the current stage's default zoom.\n\nTime & Ease will be ignored if the Ease type is 'Instant'"
+			"Changes the camera zoom\n\nValue 1: Zoom Type, Time Type\nValue 2: New Zoom Value, Time, Ease.\n\nZoom Types:\n\nAbsolute: Set zoom directly.\nStage: Set zoom as a multiplier of the current stage's default zoom.\n\nTime Options are A (Steps) and B (Seconds), Defaults to A.\n\nTime & Ease will be ignored if the Ease type is 'Instant'"
 		]
 	];
 		
