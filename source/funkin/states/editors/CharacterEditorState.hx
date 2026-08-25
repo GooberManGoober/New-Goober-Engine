@@ -110,6 +110,8 @@ class CharacterEditorState extends UIState // MUST EXTEND UI STATE needed for ac
 	
 	var goToPlayState:Bool = false;
 	
+	var _disableFocusLater:Bool = false;
+	
 	public function new(?char:String, goToPlayState:Bool = false)
 	{
 		super();
@@ -321,6 +323,7 @@ class CharacterEditorState extends UIState // MUST EXTEND UI STATE needed for ac
 					FlxG.sound.play(Paths.sound('ui/error'));
 				}
 			}
+			_disableFocusLater = true;
 		}
 		
 		uiElements.toolBar.loadTemplateButton.onClick = (ui) -> {
@@ -425,7 +428,7 @@ class CharacterEditorState extends UIState // MUST EXTEND UI STATE needed for ac
 		uiElements.characterDialogBox.vSliceSusCheckbox.onChange = (ui) -> {
 			character.vSliceSustains = ui.value.toBool();
 		}
-
+		
 		uiElements.characterDialogBox.ghostEnabledCheckbox.onChange = (ui) -> {
 			character.ghostsEnabled = ui.value.toBool();
 		}
@@ -896,6 +899,12 @@ class CharacterEditorState extends UIState // MUST EXTEND UI STATE needed for ac
 		{
 			exitState();
 		}
+		
+		if (_disableFocusLater)
+		{
+			_disableFocusLater = false;
+			ToolKitUtils.forceUnfocus();
+		}
 	}
 	
 	var wasDraggingCursor:Bool = false;
@@ -1027,6 +1036,7 @@ class CharacterEditorState extends UIState // MUST EXTEND UI STATE needed for ac
 			
 			character.playAnim(anim, true);
 			uiElements.animationList.animationList.selectItemBy((item) -> return item.id == anim);
+			_disableFocusLater = true;
 		}
 		
 		if (FlxG.keys.justPressed.A)
@@ -1388,6 +1398,7 @@ class CharacterEditorState extends UIState // MUST EXTEND UI STATE needed for ac
 			
 			charLayer.insert(0, characterGhost);
 			characterGhost.debugMode = true;
+			characterGhost.useRenderTexture = true;
 		}
 		
 		characterGhost.loadAtlas(character.imageFile);
@@ -1420,6 +1431,8 @@ class CharacterEditorState extends UIState // MUST EXTEND UI STATE needed for ac
 		characterGhost.animCurFrame = character.animCurFrame;
 		
 		characterGhost.offset.copyFrom(character.offset);
+		characterGhost.spriteOffset.copyFrom(character.spriteOffset);
+		characterGhost.animOffset.copyFrom(character.animOffset);
 		
 		characterGhost.alpha = uiElements.toolBar.ghostAlphaSlider.value;
 		updateGhostLayering();
