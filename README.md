@@ -12,7 +12,7 @@ Havee fun with NightmareVision V1! (***[follow me on twitter](https://twitter.co
 
 * Nebula_Zorua for the [specific Psych fork](https://github.com/nebulazorua/exe-psych-fork) NMV is built off and for the Modchart backend
 
-* Rozebud for the chart editor little buddies ([Check out their engine too](https://github.com/ThatRozebudDude/FPS-Plus-Public))
+* Rozebud for the chart editor little buddies, and the overhauled camera system ([Check out their engine too](https://github.com/ThatRozebudDude/FPS-Plus-Public))
 
 * FunkinCrew for their [Lime](https://github.com/FunkinCrew/lime), [Openfl](https://github.com/FunkinCrew/openfl), [Hxcpp](https://github.com/FunkinCrew/hxcpp) forks
 
