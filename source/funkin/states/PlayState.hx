@@ -269,6 +269,8 @@ class PlayState extends MusicBeatState
 	private var uiZoomTween:FlxTween;
 	private var camZoomAdjustTween:FlxTween;
 	private var uiZoomAdjustTween:FlxTween;
+	private var camZoomBopTween:FlxTween;
+	private var uiZoomBopTween:FlxTween;
 	
 	/**
 	 * Previous cameras target. used in story mode for a more seamless transition
@@ -405,6 +407,9 @@ class PlayState extends MusicBeatState
 	
 	public var defaultCamZoomAdd:Float = 0;
 	public var defaultHudZoomAdd:Float = 0;
+
+	public var defaultCamZoomBop:Float = 0;
+	public var defaultHudZoomBop:Float = 0;
 	
 	/**
 	 * Default camera zoom the game will attempt to return to.
@@ -1708,8 +1713,8 @@ class PlayState extends MusicBeatState
 
 		camFollow.setPosition(camFollowPoint.x + camFollowOffset.x, camFollowPoint.y + camFollowOffset.y);
 
-		FlxG.camera.zoom = defaultCamZoom + defaultCamZoomAdd;
-		camHUD.zoom = defaultHudZoom + defaultHudZoomAdd;
+		FlxG.camera.zoom = defaultCamZoom + defaultCamZoomAdd + defaultCamZoomBop;
+		camHUD.zoom = defaultHudZoom + defaultHudZoomAdd + defaultHudZoomBop;
 		
 		scripts.call('onUpdate', [elapsed]);
 		
@@ -2707,22 +2712,42 @@ class PlayState extends MusicBeatState
 		else defaultHudZoomAdd = zoom;
 	}
 
+	public function camChangeZoomBop(zoom:Float, time:Float, ?ease:Null<flixel.tweens.EaseFunction>, ?onComplete:Null<TweenCallback> = null):Void
+	{
+		if(onComplete == null) onComplete = function(tween:FlxTween){};
+		
+		if (camZoomBopTween != null) camZoomBopTween.cancel();
+
+		if(time > 0) camZoomBopTween = FlxTween.tween(this, {defaultCamZoomBop: zoom}, time, {ease: ease, onComplete: onComplete});
+		else defaultCamZoomBop = zoom;
+	}
+
+	public function uiChangeZoomBop(zoom:Float, time:Float, ?ease:Null<flixel.tweens.EaseFunction>, ?onComplete:Null<TweenCallback> = null):Void
+	{
+		if(onComplete == null) onComplete = function(tween:FlxTween){};
+		
+		if (uiZoomBopTween != null) uiZoomBopTween.cancel();
+
+		if(time > 0) uiZoomBopTween = FlxTween.tween(this, {defaultHudZoomBop: zoom}, time, {ease: ease, onComplete: onComplete});
+		else defaultHudZoomBop = zoom;
+	}
+
 	public function uiBop(?camZoom:Float = 0.01, ?uiZoom:Float = 0.02, ?time:Float = 0.6, ?ease:Null<flixel.tweens.EaseFunction>)
 	{
 		if (!ClientPrefs.camZooms) return;
 
 		if (ease == null) ease = FlxEase.quintOut;
 		
-		if (camZoomAdjustTween != null) camZoomAdjustTween.cancel();
-		if (uiZoomAdjustTween != null) uiZoomAdjustTween.cancel();
+		if (camZoomBopTween != null) camZoomBopTween.cancel();
+		if (uiZoomBopTween != null) uiZoomBopTween.cancel();
 
-		defaultCamZoomAdd += camZoom;
-		defaultHudZoomAdd += uiZoom;
+		defaultCamZoomBop += camZoom;
+		defaultHudZoomBop += uiZoom;
 
 		if (camZooming)
 		{
-			camChangeZoomAdjust(0, time, ease);
-			uiChangeZoomAdjust(0, time, ease);
+			camChangeZoomBop(0, time, ease);
+			uiChangeZoomBop(0, time, ease);
 		}
 	}
 	
