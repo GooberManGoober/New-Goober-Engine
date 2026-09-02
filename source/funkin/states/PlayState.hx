@@ -656,7 +656,6 @@ class PlayState extends MusicBeatState
 		var vizLoadStart:Float = traceCheck ? Sys.time() : 0;
 		
 		stage = new Stage(SONG.stage);
-		scripts.set('stage', stage);
 		applyStageData(stage.stageData);
 		
 		stage.buildStage();
@@ -698,9 +697,6 @@ class PlayState extends MusicBeatState
 			gfGroup.addChar(gf);
 			gfGroup.parent = gf;
 			startCharacterScript(gf.curCharacter, gf);
-			
-			scripts.set('gf', gf);
-			scripts.set('gfGroup', gfGroup);
 		}
 		
 		dad = new Character(SONG.player2);
@@ -713,22 +709,18 @@ class PlayState extends MusicBeatState
 		boyfriendGroup.addChar(boyfriend);
 		boyfriendGroup.parent = boyfriend;
 		
-		scripts.set('dad', dad);
-		scripts.set('dadGroup', dadGroup);
-		
-		scripts.set('boyfriend', boyfriend);
-		scripts.set('boyfriendGroup', boyfriendGroup);
-		
-		var camPos:FlxPoint = new FlxPoint(
-			FlxMath.lerp(
-				getCharacterCameraPos(dad).x,
-				getCharacterCameraPos(boyfriend).x, 0.5
-			),
-			FlxMath.lerp(
-				getCharacterCameraPos(dad).y,
-				getCharacterCameraPos(boyfriend).y, 0.5
-			)
-		);
+		var camPos:FlxPoint = FlxPoint.get(girlfriendCameraOffset[0], girlfriendCameraOffset[1]);
+		if (gf != null)
+		{
+			camPos.x += gf.getGraphicMidpoint().x + gf.cameraPosition[0];
+			camPos.y += gf.getGraphicMidpoint().y + gf.cameraPosition[1];
+		}
+		else
+		{
+			camPos.set(opponentCameraOffset[0], opponentCameraOffset[1]);
+			camPos.x += dad.getGraphicMidpoint().x + dad.cameraPosition[0];
+			camPos.y += dad.getGraphicMidpoint().y + dad.cameraPosition[1];
+		}
 		
 		if (dad.curCharacter.startsWith('gf'))
 		{
@@ -992,10 +984,6 @@ class PlayState extends MusicBeatState
 			splashLayering.push(splashGrp);
 		}
 		
-		// this broke a lot so im adding it back sorry data
-		scripts.set('playerStrums', playerStrums);
-		scripts.set('opponentStrums', opponentStrums);
-		
 		modManager.receptors = [for (i in playFields) i.members];
 		
 		modManager.lanes = SONG.lanes;
@@ -1186,7 +1174,6 @@ class PlayState extends MusicBeatState
 		// Updating Discord Rich Presence (with Time Left)
 		if (automatedDiscord) DiscordClient.changePresence(rpcDescription, rpcSongName + ' ' + rpcDifficulty, null, true, songLength);
 		
-		scripts.set('songLength', songLength);
 		scripts.call('onSongStart', []);
 		callHUDFunc(hud -> hud.onSongStart());
 	}
@@ -1660,7 +1647,12 @@ class PlayState extends MusicBeatState
 	
 	override public function onFocus():Void
 	{
-		if (!isDead && !paused) resetDiscordRPC(Conductor.songPosition > 0.0);
+		if (!isDead && !paused)
+		{
+			resetDiscordRPC(Conductor.songPosition > 0.0);
+			
+			if (audio.inst != null && !startingSong) resyncVocals();
+		}
 		
 		super.onFocus();
 	}
@@ -1684,17 +1676,25 @@ class PlayState extends MusicBeatState
 		else DiscordClient.changePresence(rpcDescription, rpcSongName + ' ' + rpcDifficulty, null, true, songLength - Conductor.songPosition - ClientPrefs.noteOffset);
 	}
 	
-	function resyncVocals():Void
+	function checkResync():Void
+	{
+		final maxToleratedOffset:Float = (ClientPrefs.streamedMusic ? 50 : 20) * playbackRate;
+		
+		final correctTime = Math.abs(Conductor.songPosition - Conductor.offset);
+		final songSync = SONG.needsVoices ? audio.getDesyncDifference(correctTime) : correctTime - audio.inst.time;
+		
+		if (songSync > maxToleratedOffset) resyncVocals();
+	}
+	
+	public function resyncVocals():Void
 	{
 		if (finishTimer != null) return;
 		
 		audio.pitch = playbackRate;
 		audio.volume = 1 * volumeMult;
-		audio.pause();
-		audio.time = audio.inst.time;
-		Conductor.songPosition = audio.inst.time;
+		audio.resync(Conductor.songPosition);
+		audio.hit();
 		#if FLX_PITCH audio.pitch = playbackRate; #end
-		audio.play();
 	}
 	
 	public var canAccessEditors:Bool = true;
@@ -2130,15 +2130,6 @@ class PlayState extends MusicBeatState
 				gf.danceEveryNumBeats *= gfSpeed;
 		}
 		
-		scripts.set('boyfriend', boyfriend);
-		scripts.set('boyfriendGroup', boyfriendGroup);
-		
-		scripts.set('dad', dad);
-		scripts.set('dadGroup', dadGroup);
-		
-		scripts.set('gf', gf);
-		scripts.set('gfGroup', gfGroup);
-		
 		callHUDFunc(hud -> hud.onCharacterChange());
 	}
 	
@@ -2194,8 +2185,6 @@ class PlayState extends MusicBeatState
 				}
 				
 			case 'Camera Zoom':
-				if (camZoomTween != null) camZoomTween.cancel();
-				
 				var val1:Float = Std.parseFloat(value1);
 				if (Math.isNaN(val1)) val1 = 1;
 				
@@ -2209,10 +2198,8 @@ class PlayState extends MusicBeatState
 					if (split[1] != null) leEase = split[1].trim();
 					if (Math.isNaN(duration)) duration = 0;
 					
-					if (duration > 0) camZoomTween = FlxTween.tween(this, {defaultCamZoom: targetZoom}, duration, {ease: FlxEase.circOut});
-					else defaultCamZoom = targetZoom;
+					camChangeZoom(targetZoom, duration, FlxEase.circOut);
 				}
-				scripts.set('defaultCamZoom', defaultCamZoom);
 				
 			case 'HUD Fade':
 				FlxTween.cancelTweensOf(camHUD, ['alpha']);
@@ -2765,10 +2752,7 @@ class PlayState extends MusicBeatState
 			songEndCallback = endSong;
 		}
 		
-		if (ClientPrefs.noteOffset <= 0 || ignoreNoteOffset)
-		{
-			songEndCallback();
-		}
+		if (ClientPrefs.noteOffset <= 0 || ignoreNoteOffset) songEndCallback();
 		else
 		{
 			finishTimer = new FlxTimer().start(ClientPrefs.noteOffset / 1000, function(tmr:FlxTimer) {
@@ -3145,18 +3129,11 @@ class PlayState extends MusicBeatState
 	{
 		super.stepHit();
 		
-		final maxToleratedOffset:Float = 20 * playbackRate;
-		
-		if (audio.inst != null)
-		{
-			if (Math.abs(audio.inst.time - (Conductor.songPosition - Conductor.offset)) > maxToleratedOffset
-				|| (SONG.needsVoices && audio.getDesyncDifference(Math.abs(Conductor.songPosition - Conductor.offset)) > maxToleratedOffset)) resyncVocals();
-		}
+		if (audio.inst != null && !endingSong) checkResync();
 		
 		if (curStep == lastStepHit) return;
 		
 		lastStepHit = curStep;
-		scripts.set('curStep', curStep);
 		
 		scripts.call('onStepHit');
 		
@@ -3181,7 +3158,6 @@ class PlayState extends MusicBeatState
 
 		lastBeatHit = curBeat;
 		
-		scripts.set('curBeat', curBeat);
 		scripts.call('onBeatHit');
 		callHUDFunc(hud -> hud.beatHit());
 	}
@@ -3212,7 +3188,6 @@ class PlayState extends MusicBeatState
 		
 		super.sectionHit();
 		
-		scripts.set('curSection', curSection);
 		scripts.call('onSectionHit');
 		callHUDFunc(hud -> hud.sectionHit());
 	}
