@@ -14,6 +14,7 @@
     <define name="MODS_ALLOWED" if="desktop"/>
     <define name="VIDEOS_ALLOWED" if="cpp"/>
     <define name="DISCORD_ALLOWED" if="cpp" unless="android || ios"/>
+    <define name="FOXLITE_ALLOWED"/>
 
     <!-- PATH SETTINGS -->
 
@@ -55,6 +56,8 @@
 
     <haxelib name="funkin.vis"/>
     <haxelib name="grig.audio"/>
+
+    <haxelib name="foxlite" if="FOXLITE_ALLOWED"/>
     
     <haxelib name="json5hx"/>
 

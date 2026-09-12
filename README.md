@@ -18,6 +18,8 @@ Havee fun with NightmareVision V1! (***[follow me on twitter](https://twitter.co
 
 * MaybeMaru for [MoonChart](https://github.com/MaybeMaru/moonchart) and [Flixel-Animate](https://github.com/MaybeMaru/flixel-animate)
 
+* dwdvIl for [Foxlite](https://github.com/dwdvIl/foxlite)
+
 
 # How to compile NMV Engine
 
