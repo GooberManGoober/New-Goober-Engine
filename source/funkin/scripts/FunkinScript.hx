@@ -245,7 +245,6 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		set('curDecStep', 0);
 		set('version', Main.NMV_VERSION.trim());
 		set('asset_redirect', #if ASSET_REDIRECT true #else false #end);
-		set('foxlite_allowed', #if FOXLITE_ALLOWED true #else false #end);
 		set('Defines', funkin.data.Defines);
 		
 		// set flixel related stuff
@@ -334,25 +333,6 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		
 		set("GameOverSubstate", funkin.states.substates.GameOverSubstate);
 
-		#if FOXLITE_ALLOWED
-		set("FoxModel", foxlite.FoxModel);
-		set("FoxShader", foxlite.FoxShader);
-		set("FoxScene", foxlite.FoxScene);
-
-		set("FlxFox3DSprite", foxlite.extras.FlxFox3DSprite);
-		set("FoxFPSCamera", foxlite.extras.FoxFPSCamera);
-
-		set("FoxLoaderUtil", foxlite.loaders.FoxLoaderUtil);
-		set("FoxGLTFLoader", foxlite.loaders.FoxGLTFLoader);
-		set("FoxOBJLoader", foxlite.loaders.FoxOBJLoader);
-
-		set("FoxRenderer", foxlite.renderer.FoxRenderer);
-		set("FoxRenderPass", foxlite.renderer.FoxRenderPass);
-
-		set("FoxExtendableSprite", foxlite.funkin.FoxExtendableSprite);
-		set("FoxFunkinSprite", foxlite.funkin.FoxFunkinSprite);
-		#end
-		
 		// objects
 		set("Note", funkin.objects.note.Note);
 		set("Bar", funkin.objects.Bar);
