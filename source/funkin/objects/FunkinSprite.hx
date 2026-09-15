@@ -372,7 +372,7 @@ class FunkinSprite extends FlxAnimate
 	
 	var _transformedAnimOffset:FlxPoint = FlxPoint.get();
 	
-	override function getScreenPosition(?result:FlxPoint, ?camera:FlxCamera):FlxPoint
+	override function prepareDrawMatrix(matrix:flixel.math.FlxMatrix, camera:FlxCamera):Void
 	{
 		super.prepareDrawMatrix(matrix, camera);
 

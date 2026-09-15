@@ -146,6 +146,31 @@ class Paths
 	{
 		return getPath('images/$key', parentFolder, checkMods);
 	}
+
+	public static inline function obj(key:String, ?parentFolder:String, checkMods:Bool = true):String
+	{
+		return getPath('models/$key.obj', parentFolder, checkMods);
+	}
+
+	public static inline function dae(key:String, ?parentFolder:String, checkMods:Bool = true):String
+	{
+		return getPath('models/$key.dae', parentFolder, checkMods);
+	}
+
+	public static inline function md2(key:String, ?parentFolder:String, checkMods:Bool = true):String
+	{
+		return getPath('models/$key.md2', parentFolder, checkMods);
+	}
+
+	public static inline function md5(key:String, ?parentFolder:String, checkMods:Bool = true):String
+	{
+		return getPath('models/$key.md5', parentFolder, checkMods);
+	}
+
+	public static inline function awd(key:String, ?parentFolder:String, checkMods:Bool = true):String
+	{
+		return getPath('models/$key.awd', parentFolder, checkMods);
+	}
 	
 	/**
 	 * Searches for a file within the `sounds` directory and caches a `Sound` instance.

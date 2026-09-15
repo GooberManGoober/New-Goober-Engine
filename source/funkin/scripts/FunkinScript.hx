@@ -335,6 +335,7 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		set("GameOverSubstate", funkin.states.substates.GameOverSubstate);
 
 		#if FOXLITE_ALLOWED
+		set("FoxModel", foxlite.FoxModel);
 		set("FoxShader", foxlite.FoxShader);
 		set("FoxScene", foxlite.FoxScene);
 
@@ -343,6 +344,7 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 
 		set("FoxLoaderUtil", foxlite.loaders.FoxLoaderUtil);
 		set("FoxGLTFLoader", foxlite.loaders.FoxGLTFLoader);
+		set("FoxOBJLoader", foxlite.loaders.FoxOBJLoader);
 
 		set("FoxRenderer", foxlite.renderer.FoxRenderer);
 		set("FoxRenderPass", foxlite.renderer.FoxRenderPass);
