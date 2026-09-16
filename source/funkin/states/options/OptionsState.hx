@@ -19,7 +19,8 @@ class OptionsState extends MusicBeatState
 		'Graphics',
 		'Visuals and UI',
 		'Gameplay',
-		"Misc"
+		"Misc",
+		"Goober Exclusive"
 	];
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 	
@@ -46,6 +47,8 @@ class OptionsState extends MusicBeatState
 				openSubState(new funkin.states.options.MiscSubState());
 			case 'Adjust Delay and Combo':
 				FlxG.switchState(funkin.states.options.NoteOffsetState.new);
+			case 'Goober Exclusive':
+				openSubState(new funkin.states.options.GooberSettingsSubState());
 		}
 	}
 	
@@ -74,7 +77,8 @@ class OptionsState extends MusicBeatState
 		{
 			var optionText:Alphabet = new Alphabet(0, 0, options[i], true);
 			optionText.screenCenter();
-			optionText.y += (100 * (i - (options.length / 2))) + 50;
+			optionText.y += (80 * (i - (options.length / 2))) + 50;
+			optionText.scale.set(0.9, 0.9);
 			grpOptions.add(optionText);
 		}
 		

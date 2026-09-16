@@ -17,7 +17,7 @@ class MasterEditorMenu extends MusicBeatState
 		'Chart Editor',
 		'Character Editor',
 		'Note Skin Editor',
-		'Modchart Editor',
+		'Modchart Editor (Unfinished)',
 		'Chart Converter',
 		'Metadata Editor',
 		'Mods Manager',
@@ -127,7 +127,7 @@ class MasterEditorMenu extends MusicBeatState
 					FlxG.switchState(() -> new CharacterEditorState(Character.DEFAULT_CHARACTER, false));
 				// case 'Note Skin Editor':
 					// 	FlxG.switchState(() -> new NoteSkinEditor('default'));
-				case 'Modchart Editor':
+				case 'Modchart Editor (Unfinished)':
 					FlxG.switchState(() -> new ModchartEditorState());
 				case 'Chart Converter':
 					FlxG.switchState(() -> new ChartConverterState());
