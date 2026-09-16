@@ -220,6 +220,12 @@ class ParserEx extends Parser
 							this.char = char;
 							return TDot;
 					}
+				case "|".code:
+					char = readChar();
+					if (char == "|".code)
+						return TOp("||");
+					this.char = char;
+					return TOp("|");
 				case "{".code:
 					return TBrOpen;
 				case "}".code:
