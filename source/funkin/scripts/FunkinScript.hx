@@ -338,9 +338,24 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		set("FoxModel", foxlite.FoxModel);
 		set("FoxShader", foxlite.FoxShader);
 		set("FoxScene", foxlite.FoxScene);
+		set("FoxInstancedModel", foxlite.FoxInstancedModel);
 
 		set("FlxFox3DSprite", foxlite.extras.FlxFox3DSprite);
 		set("FoxFPSCamera", foxlite.extras.FoxFPSCamera);
+		set("FoxOrbitCamera", foxlite.extras.FoxOrbitCamera);
+
+		set("FoxDirectionalSound", foxlite.flixel.FoxDirectionalSound);
+		set("FoxFlxSprite", foxlite.flixel.FoxFlxSprite);
+		set("FoxRenderMetrics", foxlite.flixel.FoxRenderMetrics);
+
+		set("FoxExtendableSprite", foxlite.funkin.FoxExtendableSprite);
+		set("FoxFunkinSprite", foxlite.funkin.FoxFunkinSprite);
+
+		set("FoxAreaLight", foxlite.lights.FoxAreaLight);
+		set("FoxBaseLight", foxlite.lights.FoxBaseLight);
+		set("FoxDirectionalLight", foxlite.lights.FoxDirectionalLight);
+		set("FoxPointLight", foxlite.lights.FoxPointLight);
+		set("FoxSpotLight", foxlite.lights.FoxSpotLight);
 
 		set("FoxLoaderUtil", foxlite.loaders.FoxLoaderUtil);
 		set("FoxGLTFLoader", foxlite.loaders.FoxGLTFLoader);
@@ -348,9 +363,6 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 
 		set("FoxRenderer", foxlite.renderer.FoxRenderer);
 		set("FoxRenderPass", foxlite.renderer.FoxRenderPass);
-
-		set("FoxExtendableSprite", foxlite.funkin.FoxExtendableSprite);
-		set("FoxFunkinSprite", foxlite.funkin.FoxFunkinSprite);
 		#end
 		
 		// objects

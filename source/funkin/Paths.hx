@@ -147,12 +147,6 @@ class Paths
 		return getPath('images/$key', parentFolder, checkMods);
 	}
 
-	public static inline function model(key:String, ?ext:String, checkMods:Bool = true):String
-	{
-		final exts = ext != null ? [ext, 'gltf', 'glb', 'json', 'mtl', 'obj'] : ['gltf', 'glb', 'json', 'mtl', 'obj'];
-		return findFileWithExts('models/$key', exts, null, checkMods);
-	}
-	
 	/**
 	 * Searches for a file within the `sounds` directory and caches a `Sound` instance.
 	 * 
