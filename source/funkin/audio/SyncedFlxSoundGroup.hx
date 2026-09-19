@@ -117,6 +117,7 @@ class SyncedFlxSoundGroup extends FlxTypedGroup<FlxSound>
 				snd.time = time;
 				snd.play(false, time);
 			}
+			else snd.pause();
 		});
 	}
 	

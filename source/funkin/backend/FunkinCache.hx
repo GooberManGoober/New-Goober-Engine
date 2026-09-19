@@ -103,6 +103,8 @@ class FunkinCache
 	
 	public final currentTrackedSounds:CacheMap<Sound> = new CacheMap();
 	
+	public final currentTrackedData:CacheMap<String> = new CacheMap();
+	
 	public final localTrackedAssets:Array<String> = [];
 	
 	/**
@@ -118,10 +120,6 @@ class FunkinCache
 			if (disposeToo) disposeGraphic(currentTrackedGraphics.get(key));
 			currentTrackedGraphics.remove(key);
 			
-			// #if VERBOSE_LOGS
-			// Logger.log('Cleared Graphic [$key]');
-			// #end
-			
 			return true;
 		}
 		
@@ -130,9 +128,13 @@ class FunkinCache
 			if (disposeToo) Assets.cache.clear(key);
 			currentTrackedSounds.remove(key);
 			
-			// #if VERBOSE_LOGS
-			// Logger.log('Cleared Sound [$key]');
-			// #end
+			return true;
+		}
+		
+		if (currentTrackedData.exists(key))
+		{
+			if (disposeToo) Assets.cache.clear(key);
+			currentTrackedData.remove(key);
 			
 			return true;
 		}
@@ -183,11 +185,20 @@ class FunkinCache
 		return sound;
 	}
 	
+	public function cacheData(key:String, data:String):String
+	{
+		currentTrackedData.set(key, data);
+		localTrackedAssets.push(key);
+		
+		return data;
+	}
+	
 	public function toString():String
 	{
 		final bmpCache = [for (key in currentTrackedGraphics.keys()) key];
 		final sndCache = [for (key in currentTrackedSounds.keys()) key];
+		final dCache = [for (key in currentTrackedData.keys()) key];
 		
-		return 'Bmp Cache: $bmpCache\nSnd Cache: $sndCache';
+		return 'Bmp Cache: $bmpCache\nSnd Cache: $sndCache\nData Cache: $dCache';
 	}
 }

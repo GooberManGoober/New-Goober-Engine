@@ -809,6 +809,7 @@ class PlayState extends MusicBeatState
 			+ ' / '
 			+ FlxStringUtil.formatTime(audio.songLength / 1000));
 			
+		FlxG.watch.addFunction('Desync: ', () -> audio.getDesyncDifference(Math.abs(Conductor.songPosition - Conductor.offset)));
 		FlxG.watch.addFunction('curSec: ', () -> curSection);
 		FlxG.watch.addFunction('curBeat: ', () -> curBeat);
 		FlxG.watch.addFunction('curStep: ', () -> curStep);
@@ -1693,7 +1694,7 @@ class PlayState extends MusicBeatState
 	
 	function checkResync():Void
 	{
-		final maxToleratedOffset:Float = 50 * playbackRate;
+		final maxToleratedOffset:Float = 35 * playbackRate;
 		
 		final correctTime = Math.abs(Conductor.songPosition - Conductor.offset);
 		final songSync = audio.syncVoiceStatus() ? audio.getDesyncDifference(correctTime) : correctTime - audio.inst.time;
@@ -1705,7 +1706,7 @@ class PlayState extends MusicBeatState
 	{
 		if (finishTimer != null) return;
 		
-		trace('resyncing');
+		trace('resyncing at ${Conductor.songPosition}');
 		
 		audio.pitch = playbackRate;
 		audio.volume = 1 * volumeMult;

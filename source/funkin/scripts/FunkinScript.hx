@@ -114,7 +114,7 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 	{
 		name ??= file;
 		
-		return new FunkinScript(FunkinAssets.getContent(file), name, autoExecute, shareables);
+		return new FunkinScript(FunkinAssets.getContent(file, false), name, autoExecute, shareables);
 	}
 	
 	/**
