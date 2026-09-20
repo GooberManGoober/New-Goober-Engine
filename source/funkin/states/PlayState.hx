@@ -955,7 +955,7 @@ class PlayState extends MusicBeatState
 			strums.onNoteHit.add((note, field) -> {
 				if (field.ID == 1 && !camZooming) camZooming = true;
 				
-				if (field.playerControls || (!audio.splitVocals && !audio.trackSwap)) audio.hit();
+				if (field.playerControls || (!audio.splitVocals && !audio.trackSwap)) audio.setTrackVolumeState();
 				
 				if (field.playerControls && field.showRatings && !note.isSustainNote)
 				{
@@ -969,7 +969,7 @@ class PlayState extends MusicBeatState
 			{
 				if (combo > 5 && gf != null && gf.animOffsets.exists('sad')) gf.playAnimForDuration('sad', 1, true);
 				combo = 0;
-				audio.miss();
+				audio.setTrackVolumeState(true);
 				
 				if (instakillOnMiss) doDeathCheck(true);
 				
@@ -1158,7 +1158,7 @@ class PlayState extends MusicBeatState
 		#if FLX_PITCH audio.pitch = playbackRate; #end
 		audio.play();
 		
-		audio.hit();
+		audio.setTrackVolumeState();
 		
 		Conductor.songPosition = time;
 		songTime = time;
@@ -1284,10 +1284,10 @@ class PlayState extends MusicBeatState
 		audio = new PlayableSong();
 		
 		var start = traceCheck ? Sys.time() : 0;
-		audio.populate(SONG);
+		audio.loadSong(SONG);
 		if (traceCheck) trace('loading song took ${Sys.time() - start} seconds');
 		
-		audio.hit();
+		audio.setTrackVolumeState();
 		add(audio);
 		
 		#if FLX_PITCH
@@ -1692,14 +1692,14 @@ class PlayState extends MusicBeatState
 		else DiscordClient.changePresence(rpcDescription, rpcSongName + ' ' + rpcDifficulty, null, true, songLength - Conductor.songPosition - ClientPrefs.noteOffset);
 	}
 	
-	function checkResync():Void
+	inline function checkResync():Void
 	{
-		final maxToleratedOffset:Float = 35 * playbackRate;
+		final MAX_OFFSET:Float = 35 * playbackRate;
 		
 		final correctTime = Math.abs(Conductor.songPosition - Conductor.offset);
-		final songSync = audio.syncVoiceStatus() ? audio.getDesyncDifference(correctTime) : correctTime - audio.inst.time;
+		final delta = audio.getDesyncDifference(correctTime);
 		
-		if (songSync > maxToleratedOffset) resyncVocals();
+		if (delta > MAX_OFFSET) resyncVocals();
 	}
 	
 	public function resyncVocals():Void
@@ -1711,7 +1711,7 @@ class PlayState extends MusicBeatState
 		audio.pitch = playbackRate;
 		audio.volume = 1 * volumeMult;
 		audio.resync(Conductor.songPosition);
-		audio.hit();
+		audio.setTrackVolumeState();
 		#if FLX_PITCH audio.pitch = playbackRate; #end
 	}
 	
@@ -2772,7 +2772,6 @@ class PlayState extends MusicBeatState
 		
 		audio.volume = 0;
 		audio.stop();
-		audio.stopInst();
 		
 		if (songEndCallback == null)
 		{
@@ -2893,7 +2892,6 @@ class PlayState extends MusicBeatState
 		}
 		
 		audio.stop();
-		audio.stopInst();
 	}
 	
 	public function KillNotes():Void
@@ -3092,7 +3090,7 @@ class PlayState extends MusicBeatState
 							daNote.playField.onNoteMiss.dispatch(daNote, daNote.playField);
 							
 							combo = 0; // Repeat the miss code unconditionally because the actualMiss signal callback comes after the function that makes notes unable to miss
-							audio.miss();
+							audio.setTrackVolumeState(true);
 							
 							if (instakillOnMiss) doDeathCheck(true);
 							
@@ -3157,7 +3155,7 @@ class PlayState extends MusicBeatState
 	{
 		super.stepHit();
 		
-		if (audio.inst != null && !endingSong) checkResync();
+		if (!startingSong && !endingSong) checkResync();
 		
 		if (curStep == lastStepHit) return;
 		
