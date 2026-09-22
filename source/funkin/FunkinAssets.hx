@@ -77,30 +77,30 @@ class FunkinAssets
 	/**
 	 * Retrieves the content of a given file from its path
 	 */
-	public static function getContent(key:String, _useCache:Bool = true):String
+	public static function getContent(key:String, useCache:Bool = true):String
 	{
-		final useCache = _useCache && !ClientPrefs.inDevMode;
+		useCache = useCache && !ClientPrefs.inDevMode;
 		
-		if (useCache && cache.currentTrackedData.exists(key))
+		if (useCache && cache.currentTrackedTexts.exists(key))
 		{
 			cache.localTrackedAssets.push(key);
 			
 			@:nullSafety(Off)
-			return cache.currentTrackedData.get(key);
+			return cache.currentTrackedTexts.get(key);
 		}
 		
-		var data:Null<String> = null;
+		var ret:String = '';
 		
-		#if (MODS_ALLOWED || ASSET_REDIRECT) if (FileSystem.exists(key)) data = File.getContent(key);
-		else #end if (Assets.exists(key)) data = Assets.getText(key);
+		#if (MODS_ALLOWED || ASSET_REDIRECT) if (FileSystem.exists(key)) ret = File.getContent(key);
+		else #end if (Assets.exists(key)) ret = Assets.getText(key);
 		
-		if (data != null)
+		if (ret.length > 0)
 		{
-			if (useCache) cache.cacheData(key, data);
+			if (useCache) cache.cacheData(key, ret);
 		}
 		else throw 'Couldnt find file at path [$key]';
 		
-		return data;
+		return ret;
 	}
 	
 	/**

@@ -15,7 +15,7 @@ import flixel.graphics.FlxGraphic;
 class Paths
 {
 	#if ASSET_REDIRECT
-	public static inline final trail = #if macos '../../../../../../../' #else '../../../../' #end;
+	public static inline final trail = #if mac '../../../../../../../' #else '../../../../' #end;
 	#end
 	
 	/**

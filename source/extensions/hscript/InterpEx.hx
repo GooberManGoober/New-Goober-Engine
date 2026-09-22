@@ -33,8 +33,10 @@ private enum Stop
  * 
  * public fields support with `Sharables`
  */
-class InterpEx extends crowplexus.hscript.Interp
+class InterpEx extends crowplexus.hscript.Interp #if flixel implements flixel.util.FlxDestroyUtil.IFlxDestroyable #end
 {
+	static var cachedFields:Map<String, Array<String>> = [];
+	
 	public var sharedFields:Null<Sharables> = null;
 	
 	public function new(?parent:Dynamic, ?shareables:Sharables)
@@ -69,7 +71,21 @@ class InterpEx extends crowplexus.hscript.Interp
 			return parent;
 		}
 		parent = value;
-		parentFields = value != null ? Type.getInstanceFields(Type.getClass(value)) : [];
+		if (value != null)
+		{
+			var clName = Type.getClassName(Type.getClass(value));
+			if (!cachedFields.exists(clName))
+			{
+				cachedFields.set(clName, Type.getInstanceFields(Type.getClass(value)));
+			}
+			
+			parentFields = cachedFields.get(clName) ?? [];
+		}
+		else
+		{
+			parentFields = [];
+		}
+		
 		return parent;
 	}
 	
@@ -265,6 +281,21 @@ class InterpEx extends crowplexus.hscript.Interp
 		return call(o, method, args);
 	}
 	
+	#if (hl)
+	override public function get(o:Dynamic, f:String):Dynamic
+	{
+		if (o is Enum)
+		{
+			return Type.createEnum(o, f);
+			/* if (e != null) return e;
+
+				error(EInvalidAccess(f)); */
+		}
+		
+		return super.get(o, f);
+	}
+	#end
+	
 	override public function expr(e:Expr):Dynamic
 	{
 		#if hscriptPos
@@ -297,12 +328,26 @@ class InterpEx extends crowplexus.hscript.Interp
 					expr(e);
 				}
 				
+			case EFor(i, v, it, e):
+				forLoop(i, v, it, e);
+				return null;
+				
 			default:
 				super.expr(e);
 		}
 	}
 	
-	// overriden because Stop is private. DIE HSCRIPT DIE
+	override function makeIterator(v:Dynamic):Iterator<Dynamic>
+	{
+		if (v is Array) return (v : Array<Dynamic>).iterator();
+		
+		var iter:Dynamic = v.iterator;
+		v = (iter != null ? #if hl Reflect.callMethod(v, iter, []) #else (iter : haxe.Constraints.Function)() #end : v);
+		
+		if (v.hasNext == null || v.next == null) error(EInvalidIterator(v));
+		
+		return v;
+	}
 	
 	override function exprReturn(e):Dynamic
 	{
@@ -312,16 +357,34 @@ class InterpEx extends crowplexus.hscript.Interp
 		}
 		catch (e:Stop)
 		{
-			switch (e)
+			return (v : Array<Dynamic>).keyValueIterator();
+		}
+		
+		var iter:Dynamic = v.keyValueIterator;
+		v = (iter != null ? #if hl Reflect.callMethod(v, iter, []) #else (iter : haxe.Constraints.Function)() #end : v);
+		
+		if (v.hasNext == null || v.next == null) error(EInvalidIterator(v));
+		
+		return v;
+	}
+	
+	override function forLoop(n, v, it:Dynamic, e):Void
+	{
+		final old = declared.length;
+		final ef = expr.bind(e);
+		
+		declared.push({n: n, old: locals.get(n)});
+		
+		if (v == null)
+		{
+			var it = makeIterator(expr(it));
+			var next:Void->Dynamic = it.next, hasNext:Void->Bool = it.hasNext;
+			
+			while (hasNext())
 			{
-				case SBreak:
-					throw "Invalid break";
-				case SContinue:
-					throw "Invalid continue";
-				case SReturn:
-					var v = returnValue;
-					returnValue = null;
-					return v;
+				locals.set(n, {r: next(), const: false});
+				
+				if (!loopRun(ef)) break;
 			}
 		}
 		return null;
@@ -332,47 +395,54 @@ class InterpEx extends crowplexus.hscript.Interp
 		var old = declared.length;
 		do
 		{
-			try
+			declared.push({n: v, old: locals.get(v)});
+			
+			var it = makeKeyValueIterator(expr(it));
+			var next:Void->Dynamic = it.next, hasNext:Void->Bool = it.hasNext;
+			
+			while (hasNext())
 			{
-				expr(e);
-			}
-			catch (err:Stop)
-			{
-				switch (err)
-				{
-					case SContinue:
-					case SBreak:
-						break;
-					case SReturn:
-						throw err;
-				}
+				var r:Dynamic = next();
+				
+				if (r.key == null) error(ECustom('$v has no field key'));
+				if (r.value == null) error(ECustom('$v has no field value'));
+				
+				locals.set(n, {r: r.key, const: false});
+				locals.set(v, {r: r.value, const: false});
+				
+				if (!loopRun(ef)) break;
 			}
 		}
 		while (expr(econd) == true);
 		restore(old);
 	}
 	
-	override function whileLoop(econd, e)
+	inline function loopRun(f:Void->Void)
 	{
 		var old = declared.length;
 		while (expr(econd) == true)
 		{
 			try
 			{
-				expr(e);
-			}
-			catch (err:Stop)
-			{
-				switch (err)
-				{
-					case SContinue:
-					case SBreak:
-						break;
-					case SReturn:
-						throw err;
-				}
+				case ValueType.TEnum(_): // just cuase someone wouldnt make the enum PUBLIC DIE
+					switch (Type.enumConstructor(err))
+					{
+						case 'SContinue':
+						case 'SBreak': cont = false;
+						default: throw err;
+					}
+					
+				default:
+					throw err;
 			}
 		}
 		restore(old);
+	}
+	
+	public function destroy()
+	{
+		variables.clear();
+		parent = null;
+		parentFields = null;
 	}
 }

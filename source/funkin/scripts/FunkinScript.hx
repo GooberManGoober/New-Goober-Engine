@@ -56,6 +56,12 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 	 */
 	public static function init()
 	{
+		#if FLX_DEBUG
+		FlxG.console.registerClass(Iris);
+		FlxG.console.registerClass(IrisEx);
+		FlxG.console.registerClass(FunkinScript);
+		#end
+		
 		inline function formatFileLoc(fileName:String, lineNumber:Int, x:String)
 		{
 			var tempName = '[$fileName:$lineNumber]';
