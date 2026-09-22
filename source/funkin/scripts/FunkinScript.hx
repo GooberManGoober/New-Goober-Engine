@@ -340,6 +340,8 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		set("FoxScene", foxlite.FoxScene);
 		set("FoxInstancedModel", foxlite.FoxInstancedModel);
 
+		set("FoxAnimationPlayer", foxlite.animation.FoxAnimationPlayer);
+
 		set("FlxFox3DSprite", foxlite.extras.FlxFox3DSprite);
 		set("FoxFPSCamera", foxlite.extras.FoxFPSCamera);
 		set("FoxOrbitCamera", foxlite.extras.FoxOrbitCamera);
@@ -348,7 +350,6 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		set("FoxFlxSprite", foxlite.flixel.FoxFlxSprite);
 		set("FoxRenderMetrics", foxlite.flixel.FoxRenderMetrics);
 
-		set("FoxExtendableSprite", foxlite.funkin.FoxExtendableSprite);
 		set("FoxFunkinSprite", foxlite.funkin.FoxFunkinSprite);
 
 		set("FoxAreaLight", foxlite.lights.FoxAreaLight);
