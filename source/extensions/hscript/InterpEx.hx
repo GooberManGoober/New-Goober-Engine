@@ -441,8 +441,6 @@ class InterpEx extends crowplexus.hscript.Interp #if flixel implements flixel.ut
 	
 	public function destroy()
 	{
-		variables.clear();
 		parent = null;
-		parentFields = null;
 	}
 }
