@@ -245,6 +245,7 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		set('curDecStep', 0);
 		set('version', Main.NMV_VERSION.trim());
 		set('asset_redirect', #if ASSET_REDIRECT true #else false #end);
+		set('foxlite_allowed', #if FOXLITE_ALLOWED true #else false #end);
 		set('Defines', funkin.data.Defines);
 		
 		// set flixel related stuff
@@ -333,6 +334,38 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		
 		set("GameOverSubstate", funkin.states.substates.GameOverSubstate);
 
+		#if FOXLITE_ALLOWED
+		set("FoxModel", foxlite.FoxModel);
+		set("FoxShader", foxlite.FoxShader);
+		set("FoxScene", foxlite.FoxScene);
+		set("FoxInstancedModel", foxlite.FoxInstancedModel);
+
+		set("FoxAnimationPlayer", foxlite.animation.FoxAnimationPlayer);
+
+		set("FlxFox3DSprite", foxlite.extras.FlxFox3DSprite);
+		set("FoxFPSCamera", foxlite.extras.FoxFPSCamera);
+		set("FoxOrbitCamera", foxlite.extras.FoxOrbitCamera);
+
+		set("FoxDirectionalSound", foxlite.flixel.FoxDirectionalSound);
+		set("FoxFlxSprite", foxlite.flixel.FoxFlxSprite);
+		set("FoxRenderMetrics", foxlite.flixel.FoxRenderMetrics);
+
+		set("FoxFunkinSprite", foxlite.funkin.FoxFunkinSprite);
+
+		set("FoxAreaLight", foxlite.lights.FoxAreaLight);
+		set("FoxBaseLight", foxlite.lights.FoxBaseLight);
+		set("FoxDirectionalLight", foxlite.lights.FoxDirectionalLight);
+		set("FoxPointLight", foxlite.lights.FoxPointLight);
+		set("FoxSpotLight", foxlite.lights.FoxSpotLight);
+
+		set("FoxLoaderUtil", foxlite.loaders.FoxLoaderUtil);
+		set("FoxGLTFLoader", foxlite.loaders.FoxGLTFLoader);
+		set("FoxOBJLoader", foxlite.loaders.FoxOBJLoader);
+
+		set("FoxRenderer", foxlite.renderer.FoxRenderer);
+		set("FoxRenderPass", foxlite.renderer.FoxRenderPass);
+		#end
+		
 		// objects
 		set("Note", funkin.objects.note.Note);
 		set("Bar", funkin.objects.Bar);
