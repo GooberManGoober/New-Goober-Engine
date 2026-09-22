@@ -9,18 +9,6 @@ import crowplexus.iris.Iris;
 import crowplexus.hscript.*;
 import crowplexus.hscript.Expr;
 import crowplexus.hscript.Tools;
-import crowplexus.iris.Iris;
-import crowplexus.iris.IrisUsingClass;
-import crowplexus.iris.utils.UsingEntry;
-import crowplexus.hscript.Interp.LocalVar;
-
-// whgy is this private
-private enum Stop
-{
-	SBreak;
-	SContinue;
-	SReturn;
-}
 
 /**
  * Modified Iris Interp for variety of improvements.
@@ -47,29 +35,11 @@ class InterpEx extends crowplexus.hscript.Interp #if flixel implements flixel.ut
 		showPosOnLog = false;
 	}
 	
-	override function makeIterator(v:Dynamic):Iterator<Dynamic>
-	{
-		#if ((flash && !flash9) || (php && !php7 && haxe_ver < '4.0.0'))
-		if (v.iterator != null) v = v.iterator();
-		#else
-		// DATA CHANGE //does a null check because this crashes on debug build
-		if (v.iterator != null) try
-			v = v.iterator()
-		catch (e:Dynamic) {};
-		#end
-		if (v.hasNext == null || v.next == null) error(EInvalidIterator(v));
-		return v;
-	}
-	
 	public var parentFields:Array<String> = [];
 	public var parent(default, set):Dynamic;
 	
 	function set_parent(value:Dynamic)
 	{
-		if (value != null && value == parent)
-		{
-			return parent;
-		}
 		parent = value;
 		if (value != null)
 		{
@@ -98,48 +68,47 @@ class InterpEx extends crowplexus.hscript.Interp #if flixel implements flixel.ut
 		switch (e.e)
 		{
 			case EIdent(id):
-				var l = locals.get(id);
-				var v:Dynamic = (locals.exists(id) ? l.r : resolve(id));
+				final v:Dynamic = resolve(id);
 				
-				function setTo(a)
-				{
-					if (locals.exists(id))
-					{
-						if (l.const != true) l.r = a
-						else error(ECustom("Cannot reassign final, for constant expression -> " + id));
-						
-						return;
-					}
-					
-					if (variables.exists(id))
-					{
-						setVar(id, a);
-					}
-					else if (parentFields?.contains(id))
-					{
-						Reflect.setProperty(parent, id, a);
-					}
-					else if (sharedFields?.exists(id))
-					{
-						sharedFields.set(id, a);
-					}
-				}
+				if (prefix) return setTo(id, v + delta);
 				
-				if (prefix)
-				{
-					v += delta;
-					setTo(v);
-				}
-				else
-				{
-					setTo(v + delta);
-				}
+				setTo(id, v + delta);
 				
 				return v;
 				
 			default:
 				return super.increment(e, prefix, delta);
 		}
+	}
+	
+	function setTo(id:String, v:Dynamic, canDefine:Bool = false):Dynamic
+	{
+		if (locals.exists(id))
+		{
+			var l = locals.get(id);
+			
+			if (l.const != true) l.r = v;
+			else warn(ECustom('Cannot reassign final, for constant expression -> $id'));
+		}
+		else
+		{
+			if (variables.exists(id))
+			{
+				setVar(id, v);
+				return v;
+			}
+			
+			if (parentFields.contains(id) || parentFields.contains('set_$id'))
+			{
+				Reflect.setProperty(parent, id, v);
+				return v;
+			}
+			
+			if (sharedFields != null && sharedFields.exists(id)) sharedFields.set(id, v);
+		}
+		
+		if (canDefine) setVar(id, v);
+		return v;
 	}
 	
 	override function resolve(id:String):Dynamic
@@ -150,7 +119,7 @@ class InterpEx extends crowplexus.hscript.Interp #if flixel implements flixel.ut
 		
 		if (imports.exists(id)) return imports.get(id);
 		
-		if (parentFields?.contains(id)) return Reflect.getProperty(parent, id);
+		if (parentFields.contains(id) || parentFields.contains('get_$id')) return Reflect.getProperty(parent, id);
 		
 		if (sharedFields?.exists(id)) return sharedFields.get(id);
 		
@@ -165,28 +134,7 @@ class InterpEx extends crowplexus.hscript.Interp #if flixel implements flixel.ut
 		switch (Tools.expr(e1))
 		{
 			case EIdent(id):
-				var l = locals.get(id);
-				v = fop(expr(e1), expr(e2));
-				if (l == null)
-				{
-					if (parentFields.contains(id))
-					{
-						Reflect.setProperty(parent, id, v);
-					}
-					else if (sharedFields?.exists(id))
-					{
-						sharedFields.set(id, v);
-					}
-					else
-					{
-						setVar(id, v);
-					}
-				}
-				else
-				{
-					if (l.const != true) l.r = v;
-					else warn(ECustom("Cannot reassign final, for constant expression -> " + id));
-				}
+				return setTo(id, fop(expr(e1), expr(e2)));
 			case EField(e, f, s):
 				var obj = expr(e);
 				if (obj == null) if (!s) error(EInvalidAccess(f));
@@ -218,27 +166,7 @@ class InterpEx extends crowplexus.hscript.Interp #if flixel implements flixel.ut
 		switch (Tools.expr(e1))
 		{
 			case EIdent(id):
-				var l = locals.get(id);
-				if (l == null)
-				{
-					if (!variables.exists(id) && parentFields.contains(id))
-					{
-						Reflect.setProperty(parent, id, v);
-					}
-					else if (!variables.exists(id) && sharedFields != null && sharedFields.exists(id))
-					{
-						sharedFields.set(id, v);
-					}
-					else
-					{
-						setVar(id, v);
-					}
-				}
-				else
-				{
-					if (l.const != true) l.r = v;
-					else warn(ECustom("Cannot reassign final, for constant expression -> " + id));
-				}
+				return setTo(id, v, true);
 			case EField(e, f, s):
 				var e = expr(e);
 				if (e == null) if (!s) error(EInvalidAccess(f));
@@ -349,13 +277,13 @@ class InterpEx extends crowplexus.hscript.Interp #if flixel implements flixel.ut
 		return v;
 	}
 	
-	override function exprReturn(e):Dynamic
+	function makeKeyValueIterator(v:Dynamic):KeyValueIterator<Dynamic, Dynamic>
 	{
-		try
+		if ((v is haxe.ds.IntMap) || (v is haxe.ds.StringMap) || (v is haxe.ds.ObjectMap) || (v is haxe.ds.EnumValueMap))
 		{
-			return expr(e);
+			return (v : haxe.Constraints.IMap<Dynamic, Dynamic>).keyValueIterator();
 		}
-		catch (e:Stop)
+		else if (v is Array)
 		{
 			return (v : Array<Dynamic>).keyValueIterator();
 		}
@@ -387,13 +315,7 @@ class InterpEx extends crowplexus.hscript.Interp #if flixel implements flixel.ut
 				if (!loopRun(ef)) break;
 			}
 		}
-		return null;
-	}
-	
-	override function doWhileLoop(econd, e)
-	{
-		var old = declared.length;
-		do
+		else // keyvalue
 		{
 			declared.push({n: v, old: locals.get(v)});
 			
@@ -413,16 +335,21 @@ class InterpEx extends crowplexus.hscript.Interp #if flixel implements flixel.ut
 				if (!loopRun(ef)) break;
 			}
 		}
-		while (expr(econd) == true);
+		
 		restore(old);
 	}
 	
 	inline function loopRun(f:Void->Void)
 	{
-		var old = declared.length;
-		while (expr(econd) == true)
+		var cont:Bool = true;
+		
+		try
 		{
-			try
+			f();
+		}
+		catch (err:Any)
+		{
+			switch (Type.typeof(err))
 			{
 				case ValueType.TEnum(_): // just cuase someone wouldnt make the enum PUBLIC DIE
 					switch (Type.enumConstructor(err))
@@ -436,7 +363,8 @@ class InterpEx extends crowplexus.hscript.Interp #if flixel implements flixel.ut
 					throw err;
 			}
 		}
-		restore(old);
+		
+		return cont;
 	}
 	
 	public function destroy()
