@@ -212,18 +212,32 @@ class ModManager implements IFlxDestroyable
 	
 	public function updateTimeline(curStep:Float) timeline.update(curStep);
 	
-	public function getBaseX(direction:Int, player:Int):Float
+	public inline function getBaseX(direction:Int, player:Int):Float
 	{
-		var x:Float = (FlxG.width * 0.5) + Note.swagWidth * (direction - (keys / 2) + .5) - 3;
-		switch (player)
+		return (getCenterX(player, keys) + getStrumX(direction, keys));
+	}
+	
+	public static inline function getCenterX(player:Int, keys:Int):Float
+	{
+		return switch (player)
 		{
 			case 0:
-				x += FlxG.width * 0.5 - Note.swagWidth * (keys / 2) - 100;
+				(FlxG.width - Note.swagWidth * (keys / 2) - 100 - 3);
 			case 1:
-				x -= FlxG.width * 0.5 - Note.swagWidth * (keys / 2) - 100;
+				(Note.swagWidth * (keys / 2) + 100 - 3);
+			default:
+				(FlxG.width * 0.5 - 3);
 		}
-		
-		return x;
+	}
+	
+	public static inline function getStrumX(direction:Int, keys:Int):Float
+	{
+		return (Note.swagWidth * (direction - (keys / 2) + .5));
+	}
+	
+	public static inline function getBaseY():Float
+	{
+		return (Note.swagWidth * .5 + 50);
 	}
 	
 	public function updateObject(beat:Float, obj:FlxSprite, pos:Vector3, player:Int)
@@ -283,18 +297,17 @@ class ModManager implements IFlxDestroyable
 		
 		if (!obj.active) return pos;
 		
-		pos.x = getBaseX(data, player);
-		pos.y = (50 + diff + Note.swagWidth * .5);
-		pos.z = 0;
+		pos.setTo(getBaseX(data, player), getBaseY() + diff, 0);
 		
 		if (activeMods[player] != null)
 		{
 			for (name in activeMods[player])
 			{
-				if (exclusions != null && exclusions.contains(name)) continue; // because some modifiers may want the path without reverse, for example. (which is actually more common than you'd think!)
+				if (!obj.active || exclusions?.contains(name)) continue; // because some modifiers may want the path without reverse, for example. (which is actually more common than you'd think!)
+				
 				var mod:Modifier = notemodRegister.get(name);
 				if (mod == null) continue;
-				if (!obj.active) continue;
+				
 				pos = mod.getPos(time, diff, tDiff, beat, pos, data, player, obj);
 			}
 		}

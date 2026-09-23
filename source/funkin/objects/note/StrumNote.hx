@@ -10,12 +10,11 @@ import funkin.game.shaders.RGBShader;
 import funkin.states.*;
 import funkin.data.*;
 
-class StrumNote extends FunkinSprite implements funkin.game.modchart.IModNote
+class StrumNote extends funkin.game.modchart.ModchartNote
 {
-	public var intThing:Int = 0;
+	public var holding:Bool = false;
 	
 	public var resetAnim:Float = 0;
-	public var noteData:Int = 0;
 	public var direction:Float = 90;
 	public var downScroll:Bool = false;
 	public var sustainReduce:Bool = true;
@@ -26,6 +25,8 @@ class StrumNote extends FunkinSprite implements funkin.game.modchart.IModNote
 	public var parent:PlayField;
 	@:isVar
 	public var swagWidth(get, null):Float;
+	
+	public var coyoteTime:Float = 0;
 	
 	public function get_swagWidth()
 	{
@@ -60,11 +61,11 @@ class StrumNote extends FunkinSprite implements funkin.game.modchart.IModNote
 	
 	public function new(player:Int, x:Float, y:Float, leData:Int, ?parent:PlayField)
 	{
-		noteData = leData;
-		this.noteData = leData;
+		super(x, y);
+		
+		this.ID = this.noteData = leData;
 		this.parent = parent;
 		this.player = player;
-		super(x, y);
 		
 		skin = NoteUtil.getSkinFromID(parent?.player ?? 0);
 		
@@ -78,6 +79,7 @@ class StrumNote extends FunkinSprite implements funkin.game.modchart.IModNote
 		isQuant = parent?.quants ?? ClientPrefs.quants;
 		
 		handleColors();
+		playAnim('static');
 	}
 	
 	public var lastNote:Null<Note> = null;
@@ -147,17 +149,11 @@ class StrumNote extends FunkinSprite implements funkin.game.modchart.IModNote
 		}
 	}
 	
-	public function postAddedToGroup()
-	{
-		playAnim('static');
-		x -= swagWidth / 2;
-		x = x - (swagWidth * 2) + (swagWidth * noteData) + 54;
-		
-		ID = noteData;
-	}
-	
 	override function update(elapsed:Float)
 	{
+		if (coyoteTime > 0 && !holding)
+			coyoteTime = Math.max(coyoteTime - elapsed, 0);
+		
 		if (resetAnim > 0)
 		{
 			resetAnim -= elapsed;

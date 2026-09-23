@@ -81,12 +81,13 @@ abstract NoteSharedTailState(Array<Dynamic>) to Array<Dynamic>
 {
 	public function new(parent:Note)
 	{
-		this = [parent, [], null, false];
+		this = [parent, [], null, false, false];
 	}
 	
 	public var parent(get, set):Note;
 	public var tail(get, set):Array<Note>;
 	public var splash(get, set):Null<SustainSplash>;
+	public var active(get, set):Bool;
 	public var missed(get, set):Bool;
 	
 	function get_parent():Note return this[0];
@@ -95,7 +96,9 @@ abstract NoteSharedTailState(Array<Dynamic>) to Array<Dynamic>
 	
 	function get_splash():Null<SustainSplash> return this[2];
 	
-	function get_missed():Bool return this[3];
+	function get_active():Bool return this[3];
+	
+	function get_missed():Bool return this[4];
 	
 	function set_parent(v:Note):Note return this[0] = v;
 	
@@ -103,10 +106,12 @@ abstract NoteSharedTailState(Array<Dynamic>) to Array<Dynamic>
 	
 	function set_splash(v:Null<SustainSplash>):Null<SustainSplash> return this[2] = v;
 	
-	function set_missed(v:Bool):Bool return this[3] = v;
+	function set_active(v:Bool):Bool return this[3] = v;
+	
+	function set_missed(v:Bool):Bool return this[4] = v;
 }
 
-class Note extends FunkinSprite implements funkin.game.modchart.IModNote
+class Note extends funkin.game.modchart.ModchartNote
 {
 	public static var defaultNotes = ['No Animation', 'GF Sing', ''];
 	
@@ -122,7 +127,7 @@ class Note extends FunkinSprite implements funkin.game.modchart.IModNote
 	public var typeOffsetX:Float = 0; // used to offset notes, mainly for note types. use in place of offset.x and offset.y when offsetting notetypes
 	public var typeOffsetY:Float = 0;
 	
-	public var noteDiff:Float = 1000;
+	public var noteDiff(get, never):Float;
 	public var quant:Int = 4;
 	
 	public var z:Float = 0;
@@ -137,9 +142,8 @@ class Note extends FunkinSprite implements funkin.game.modchart.IModNote
 	public var strumTime:Float = 0;
 	
 	public var mustPress:Bool = false;
-	public var noteData:Int = 0;
 	public var hitPriority:Int = 1;
-	public var canBeHit:Bool = false;
+	public var canBeHit(get, never):Bool;
 	public var tooLate:Bool = false;
 	public var wasGoodHit:Bool = false;
 	public var ignoreNote:Bool = false;
@@ -156,9 +160,6 @@ class Note extends FunkinSprite implements funkin.game.modchart.IModNote
 	
 	public var tail:Array<Note> = []; // for sustains
 	public var parent:Null<Note> = null;
-	
-	// 0 to 1, 1 = missed
-	public var coyoteProgress:Float = 0;
 	
 	/**
 	 * if true, the note cannot be hit.
@@ -241,6 +242,7 @@ class Note extends FunkinSprite implements funkin.game.modchart.IModNote
 	public var playField(default, set):PlayField;
 	public var sustainSplash:SustainSplash = null;
 	public var noteSplash:NoteSplash = null;
+	public var strum:StrumNote = null;
 	
 	public var skin:NoteSkin;
 	
@@ -328,12 +330,11 @@ class Note extends FunkinSprite implements funkin.game.modchart.IModNote
 		hitPriority = 1;
 		hitHealth = .023;
 		missHealth = .0475;
-		coyoteProgress = 0;
 		scaleMod = 1;
 		
 		noAnimation = noMissAnimation = ratingDisabled = hitCausesMiss = false;
 		
-		ignoreNote = canBeHit = tooLate = wasGoodHit = noteWasHit = hitByOpponent = false;
+		ignoreNote = tooLate = wasGoodHit = noteWasHit = hitByOpponent = false;
 		
 		owner = null;
 		singers?.resize(0);
@@ -374,7 +375,6 @@ class Note extends FunkinSprite implements funkin.game.modchart.IModNote
 		if (parent != null)
 		{
 			tailState = parent.tailState;
-			parent.coyoteProgress = 0;
 		}
 		else if (tailState == null || tailState.tail.length > 0)
 		{
@@ -407,7 +407,7 @@ class Note extends FunkinSprite implements funkin.game.modchart.IModNote
 		}
 		
 		mustPress = (player == 0);
-		blockHit = isSustainNote;
+		blockHit = false;
 		
 		hitsoundDisabled = isSustainNote;
 		
@@ -597,24 +597,22 @@ class Note extends FunkinSprite implements funkin.game.modchart.IModNote
 			rgbGraphics.alpha = (alphaMod * alphaMod2) * (playField?.baseAlpha ?? 1.0);
 		}
 		
-		var actualHitbox:Float = hitbox * earlyHitMult;
-		
-		var diff = (strumTime - Conductor.songPosition);
-		noteDiff = diff;
-		var absDiff = Math.abs(diff);
-		canBeHit = absDiff <= actualHitbox;
-		
-		if (isSustainNote && parent != null)
-		{
-			if (parent.coyoteProgress >= 1 && !wasGoodHit) tooLate = true;
-		}
-		
 		if (tooLate && !inEditor && alpha > 0.3) alpha = 0.3;
+	}
+	
+	public inline function get_noteDiff():Float
+	{
+		return (strumTime - Conductor.songPosition);
+	}
+	
+	public inline function get_canBeHit():Bool
+	{
+		return (Math.abs(noteDiff) <= (hitbox * earlyHitMult));
 	}
 	
 	public inline function isLate():Bool
 	{
-		return (strumTime < Conductor.songPosition - Conductor.safeZoneOffset && !wasGoodHit && (parent?.coyoteProgress ?? 1) >= 1);
+		return (strumTime < Conductor.songPosition - Conductor.safeZoneOffset && !wasGoodHit);
 	}
 	
 	override function drawSimple(camera:FlxCamera)

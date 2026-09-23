@@ -56,6 +56,12 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 	 */
 	public static function init()
 	{
+		#if FLX_DEBUG
+		FlxG.console.registerClass(Iris);
+		FlxG.console.registerClass(IrisEx);
+		FlxG.console.registerClass(FunkinScript);
+		#end
+		
 		inline function formatFileLoc(fileName:String, lineNumber:Int, x:String)
 		{
 			var tempName = '[$fileName:$lineNumber]';
@@ -114,7 +120,7 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 	{
 		name ??= file;
 		
-		return new FunkinScript(FunkinAssets.getContent(file), name, autoExecute, shareables);
+		return new FunkinScript(FunkinAssets.getContent(file, false), name, autoExecute, shareables);
 	}
 	
 	/**
@@ -237,11 +243,6 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		set('Function_Halt', funkin.scripting.ScriptConstants.HALT_FUNC);
 		set('Function_Stop', funkin.scripting.ScriptConstants.STOP_FUNC);
 		set('Function_Continue', funkin.scripting.ScriptConstants.CONTINUE_FUNC);
-		set('curBeat', 0);
-		set('curStep', 0);
-		set('curSection', 0);
-		set('curDecBeat', 0);
-		set('curDecStep', 0);
 		set('version', Main.NMV_VERSION.trim());
 		set('asset_redirect', #if ASSET_REDIRECT true #else false #end);
 		set('Defines', funkin.data.Defines);
@@ -249,7 +250,7 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		// set flixel related stuff
 		set("FlxG", flixel.FlxG);
 		set("FlxSprite", flixel.FlxSprite);
-		set("FlxCamera", extensions.flixel.FlxCameraEx);
+		set("FlxCamera", funkin.backend.FunkinCamera);
 		set("FlxMath", flixel.math.FlxMath);
 		set("FlxTimer", flixel.util.FlxTimer);
 		set("FlxTween", flixel.tweens.FlxTween);

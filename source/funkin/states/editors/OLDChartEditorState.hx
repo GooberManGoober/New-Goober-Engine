@@ -266,7 +266,7 @@ class OLDChartEditorState extends MusicBeatState
 		// DiscordClient.changePresence("Chart Editor", StringTools.replace(_song.song, '-', ' '));
 		DiscordClient.changePresence("Chart Editor", "Uhm idk mane burp");
 		
-		camHUD = new FlxCamera();
+		camHUD = new FunkinCamera();
 		camHUD.bgColor = 0x0;
 		FlxG.cameras.add(camHUD, false);
 		
@@ -2468,10 +2468,7 @@ class OLDChartEditorState extends MusicBeatState
 					
 					if (!playedSound[note.lane] && ((playSoundBf.checked && note.mustPress) || (playSoundDad.checked && !note.mustPress)))
 					{
-						var soundToPlay = 'hitsound';
-						if (_song.player1 == 'gf') soundToPlay = ('GF_' + Std.string(note.noteData + 1)); // Easter egg
-						
-						FlxG.sound.play(Paths.sound(soundToPlay)).pan = (note.noteData < (_song.keys * .5) ? -0.3 : 0.3); // would be coolio
+						FlxG.sound.play(Paths.sound('hitsound')).pan = (note.noteData < (_song.keys * .5) ? -0.3 : 0.3); // would be coolio
 						playedSound[note.lane] = true;
 					}
 				}

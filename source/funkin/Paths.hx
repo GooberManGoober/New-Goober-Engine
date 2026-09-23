@@ -3,6 +3,7 @@ package funkin;
 import haxe.io.Path;
 
 import openfl.media.Sound;
+import openfl.display.BitmapData;
 
 import flixel.FlxG;
 import flixel.graphics.frames.FlxAtlasFrames;
@@ -14,7 +15,7 @@ import flixel.graphics.FlxGraphic;
 class Paths
 {
 	#if ASSET_REDIRECT
-	public static inline final trail = #if macos '../../../../../../../' #else '../../../../' #end;
+	public static inline final trail = #if mac '../../../../../../../' #else '../../../../' #end;
 	#end
 	
 	/**
@@ -232,6 +233,37 @@ class Paths
 	public static inline function image(key:String, ?parentFolder:String, allowGPU:Bool = true, checkMods:Bool = true):FlxGraphic
 	{
 		return FunkinAssets.getGraphic(getPath('images/$key.png', parentFolder, checkMods), true, allowGPU);
+	}
+	
+	/**
+	 * Loads a graphic from url to a sprite.
+	 * 
+	 * png only tho..
+	 * @param url 
+	 * @param allowGPU 
+	 * @return FlxGraphic
+	 */
+	public static function imageFromURL(url:String, fallback:String->Void = null, allowGPU:Bool = true):FlxGraphic
+	{
+		if (!url.contains('.png')) return null;
+		
+		var returnBitmap:FlxGraphic = FunkinAssets.getGraphicUnsafe(url, true, allowGPU);
+		if (returnBitmap == null)
+		{
+			final err:String->Void = (msg) -> {
+				trace('Error reading URL image: $msg');
+			};
+			
+			var http = new Http(url);
+			http.onBytes = (bytes) -> {
+				final bitmap = BitmapData.fromBytes(bytes);
+				if (bitmap != null) returnBitmap = FunkinAssets.cache.cacheBitmap(url, bitmap, allowGPU);
+			}
+			http.onError = fallback == null ? err : fallback;
+			http.request(false);
+		}
+		
+		return returnBitmap;
 	}
 	
 	/**
