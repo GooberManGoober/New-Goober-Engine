@@ -388,7 +388,7 @@ class ChartEditorState extends haxe.ui.backend.flixel.UIState
 		DiscordClient.changePresence("Chart Editor", "Uhm idk mane burp");
 		
 		FlxG.cameras.reset();
-		camHUD = new FlxCamera();
+		camHUD = new FunkinCamera();
 		camHUD.bgColor = 0x0;
 		FlxG.cameras.add(camHUD, false);
 		

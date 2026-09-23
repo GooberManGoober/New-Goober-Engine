@@ -622,9 +622,9 @@ class PlayState extends MusicBeatState
 		practiceMode = ClientPrefs.getGameplaySetting('practice', false);
 		cpuControlled = ClientPrefs.getGameplaySetting('botplay', false);
 		
-		camGame = new FlxCameraEx();
-		camHUD = new FlxCameraEx();
-		camOther = new FlxCameraEx();
+		camGame = new FunkinCamera();
+		camHUD = new FunkinCamera();
+		camOther = new FunkinCamera();
 		
 		camHUD.bgColor = 0x0;
 		camOther.bgColor = 0x0;
@@ -1727,6 +1727,7 @@ class PlayState extends MusicBeatState
 	var canPause:Bool = true;
 	
 	static var _modchartVector:funkin.backend.math.Vector3 = funkin.backend.math.Vector3.get();
+	
 	inline function modchart(obj:Dynamic, id:Int, offsets:haxe.ds.Vector<FlxPoint>)
 	{
 		final pos = modManager.getPos(0, 0, 0, curDecBeat, obj.noteData, id, obj, _modchartVector);
@@ -1809,7 +1810,7 @@ class PlayState extends MusicBeatState
 		
 		while (queueNotes.length > 0 && (queueNotes[0].strumTime - Conductor.songPosition) < spawnOffset)
 			recycleNote(queueNotes.shift());
-		
+			
 		final canUpdateModchart:Bool = (modifiersRegistered && playFields != null);
 		
 		if (canUpdateModchart)
@@ -1818,7 +1819,8 @@ class PlayState extends MusicBeatState
 			{
 				final id = playField.ID, skin = playField._skin;
 				
-				for (strum in playField) {
+				for (strum in playField)
+				{
 					if (strum?.alive) modchart(strum, id, skin.receptorOffsets);
 				}
 			}
@@ -1831,7 +1833,7 @@ class PlayState extends MusicBeatState
 			var i:Int = 0;
 			while (i < notes.length)
 			{
-				var daNote = notes.members[i ++];
+				var daNote = notes.members[i++];
 				
 				if (!daNote.alive) continue;
 				
@@ -1847,8 +1849,8 @@ class PlayState extends MusicBeatState
 				{
 					daNote.tooLate = true;
 					
-					if (!daNote.ignoreNote && !daNote.canMiss && !daNote.tailState.missed && (!daNote.isSustainNote || daNote.strum.coyoteTime <= 0) && !endingSong)
-						field.onNoteMiss.dispatch(daNote, field);
+					if (!daNote.ignoreNote && !daNote.canMiss && !daNote.tailState.missed && (!daNote.isSustainNote || daNote.strum.coyoteTime <= 0) && !endingSong) field.onNoteMiss.dispatch(daNote,
+						field);
 				}
 				
 				if ((daNote.tooLate && Conductor.songPosition >= noteKillOffset + daNote.strumTime + daNote.sustainLength)
@@ -1913,12 +1915,15 @@ class PlayState extends MusicBeatState
 			{
 				final id = playField.ID, skin = playField._skin;
 				
-				for (splash in playField.grpSusSplashes) {
+				for (splash in playField.grpSusSplashes)
+				{
 					if (splash?.alive) modchart(splash, id, skin.sustainSplashOffsets);
 				}
 				
-				if (playField.trackNoteSplashes) {
-					for (splash in playField.grpNoteSplashes) {
+				if (playField.trackNoteSplashes)
+				{
+					for (splash in playField.grpNoteSplashes)
+					{
 						if (splash?.alive) modchart(splash, id, skin.splashOffsets);
 					}
 				}
@@ -2023,21 +2028,21 @@ class PlayState extends MusicBeatState
 			return null;
 		}
 		/* this is probably not super helpful
-		else if (expectedPlayfield.autoPlayed && note.strumTime <= Conductor.songPosition && !note.ignoreNote)
-		{
-			expectedPlayfield.onNoteHit.dispatch(note, expectedPlayfield);
-			note.kill();
-			
-			return null;
-		}
-		else if (!expectedPlayfield.autoPlayed && note.isLate() && !note.ignoreNote && !note.canMiss && !endingSong) // dont Even bother
-		{
-			expectedPlayfield.onNoteMiss.dispatch(note, expectedPlayfield);
-			note.kill();
-			
-			return null;
-		}
-		*/
+			else if (expectedPlayfield.autoPlayed && note.strumTime <= Conductor.songPosition && !note.ignoreNote)
+			{
+				expectedPlayfield.onNoteHit.dispatch(note, expectedPlayfield);
+				note.kill();
+				
+				return null;
+			}
+			else if (!expectedPlayfield.autoPlayed && note.isLate() && !note.ignoreNote && !note.canMiss && !endingSong) // dont Even bother
+			{
+				expectedPlayfield.onNoteMiss.dispatch(note, expectedPlayfield);
+				note.kill();
+				
+				return null;
+			}
+		 */
 		else
 		{
 			expectedPlayfield.addNote(note);
@@ -3076,11 +3081,11 @@ class PlayState extends MusicBeatState
 			var i:Int = 0;
 			while (i < notes.length)
 			{
-				final daNote:Note = notes.members[i ++];
+				final daNote:Note = notes.members[i++];
 				
 				if (!daNote.alive || !daNote.isSustainNote || daNote.blockHit || daNote.tooLate || daNote.playField.autoPlayed
 					|| !daNote.playField.inControl || !daNote.playField.playerControls) continue;
-				
+					
 				final holding:Bool = input.inputPressed(daNote.noteData);
 				
 				if (daNote.wasGoodHit)
@@ -3105,7 +3110,7 @@ class PlayState extends MusicBeatState
 			
 			// HOLDING
 			var anyPressed:Bool = false;
-			for (i in 0 ... SONG.keys)
+			for (i in 0...SONG.keys)
 			{
 				if (input.inputPressed(i))
 				{
