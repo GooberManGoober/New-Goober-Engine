@@ -1,5 +1,6 @@
 package extensions.foxlite;
 
+#if FOXLITE_ALLOWED
 import foxlite.material.FoxMaterial;
 import foxlite.material.FoxTriangleFace;
 
@@ -44,3 +45,4 @@ class FoxFunkinSpriteEx extends FoxFunkinSprite
 		if (funkinSprite != null) _matrix.translate(-funkinSprite?._transformedAnimOffset.x, -funkinSprite?._transformedAnimOffset.y); // shi man idk
 	}
 }
+#end
