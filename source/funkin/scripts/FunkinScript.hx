@@ -341,35 +341,114 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		set("GameOverSubstate", funkin.states.substates.GameOverSubstate);
 
 		#if FOXLITE_ALLOWED
+		set("FoxCache", foxlite.FoxCache);
+		set("FoxCamera", foxlite.FoxCamera);
 		set("FoxModel", foxlite.FoxModel);
 		set("FoxShader", foxlite.FoxShader);
 		set("FoxScene", foxlite.FoxScene);
 		set("FoxInstancedModel", foxlite.FoxInstancedModel);
 
+		set("FoxAnimation", foxlite.animation.FoxAnimation);
+		set("FoxAnimationBlender", foxlite.animation.FoxAnimationBlender);
+		set("FoxAnimationLinker", foxlite.animation.FoxAnimationLinker);
 		set("FoxAnimationPlayer", foxlite.animation.FoxAnimationPlayer);
+		set("FoxAnimationTrack", foxlite.animation.FoxAnimationTrack);
+		set("FoxEaseType", funkin.utils.MacroUtil.buildAbstract(foxlite.animation.FoxEaseType));
+		set("FoxKeyframe", foxlite.animation.FoxKeyframe);
+		set("FoxLerp", foxlite.animation.FoxLerp);
+		set("FoxTrackType", funkin.utils.MacroUtil.buildAbstract(foxlite.animation.FoxTrackType));
+
+		set("FoxColorUtil", foxlite.color.FoxColorUtil);
+
+		set("BoundingBox", foxlite.culling.BoundingBox);
+		set("FrustumPlanes", foxlite.culling.FrustumPlanes);
+
+		set("FoxEnvironment", foxlite.environment.FoxEnvironment);
 
 		set("FlxFox3DSprite", foxlite.extras.FlxFox3DSprite);
 		set("FoxFPSCamera", foxlite.extras.FoxFPSCamera);
 		set("FoxOrbitCamera", foxlite.extras.FoxOrbitCamera);
 
+		set("FlxTypedSignalImpl", funkin.utils.MacroUtil.buildAbstract(foxlite.flixel.FlxTypedSignalImpl));
 		set("FoxDirectionalSound", foxlite.flixel.FoxDirectionalSound);
 		set("FoxFlxSprite", foxlite.flixel.FoxFlxSprite);
 		set("FoxRenderMetrics", foxlite.flixel.FoxRenderMetrics);
 
-		set("FoxFunkinSprite", foxlite.funkin.FoxFunkinSprite);
+		set("FoxFunkinSprite", extensions.foxlite.FoxFunkinSpriteEx);
+
+		set("FoxGroup", foxlite.group.FoxGroup);
+		set("FoxObjectGroup", foxlite.group.FoxObjectGroup);
+		set("FoxTypedGroup", foxlite.group.FoxTypedGroup);
+
+		set("FoxInstanceChunkData", foxlite.instancing.FoxInstanceChunkData);
+		set("FoxInstanceData", foxlite.instancing.FoxInstanceData);
+		set("FoxInstanceUpdateMode", funkin.utils.MacroUtil.buildAbstract(foxlite.instancing.FoxInstanceUpdateMode));
 
 		set("FoxAreaLight", foxlite.lights.FoxAreaLight);
+		set("FoxAreaLightShape", funkin.utils.MacroUtil.buildAbstract(foxlite.lights.FoxAreaLightShape));
 		set("FoxBaseLight", foxlite.lights.FoxBaseLight);
 		set("FoxDirectionalLight", foxlite.lights.FoxDirectionalLight);
+		set("FoxLightData", foxlite.lights.FoxLightData);
+		set("FoxLightType", funkin.utils.MacroUtil.buildAbstract(foxlite.lights.FoxLightType));
 		set("FoxPointLight", foxlite.lights.FoxPointLight);
 		set("FoxSpotLight", foxlite.lights.FoxSpotLight);
 
-		set("FoxLoaderUtil", foxlite.loaders.FoxLoaderUtil);
+		// set("FoxAWDLoader", foxlite.loaders.FoxAWDLoader); // Will get added later when this is done
 		set("FoxGLTFLoader", foxlite.loaders.FoxGLTFLoader);
+		set("FoxJSONLoader", foxlite.loaders.FoxJSONLoader);
+		set("FoxLoaderUtil", foxlite.loaders.FoxLoaderUtil);
+		set("FoxMTLLoader", foxlite.loaders.FoxMTLLoader);
 		set("FoxOBJLoader", foxlite.loaders.FoxOBJLoader);
 
+		set("FoxBlendMode", funkin.utils.MacroUtil.buildAbstract(foxlite.material.FoxBlendMode));
+		set("FoxDepthCompareMode", funkin.utils.MacroUtil.buildAbstract(foxlite.material.FoxDepthCompareMode));
+		set("FoxMaterial", foxlite.material.FoxMaterial);
+		set("FoxTriangleFace", funkin.utils.MacroUtil.buildAbstract(foxlite.material.FoxTriangleFace));
+
+		set("FoxMathUtil", foxlite.math.FoxMathUtil);
+
+		set("FoxIndexBuffer", foxlite.mesh.buffer.FoxIndexBuffer);
+		set("FoxVertexBuffer", foxlite.mesh.buffer.FoxVertexBuffer);
+		set("FoxVertexBufferType", funkin.utils.MacroUtil.buildAbstract(foxlite.mesh.buffer.FoxVertexBufferType));
+
+		set("FoxCubeMesh", foxlite.mesh.FoxCubeMesh);
+		set("FoxLineMesh", foxlite.mesh.FoxLineMesh);
+		set("FoxMesh", foxlite.mesh.FoxMesh);
+		set("FoxQuadFace", funkin.utils.MacroUtil.buildAbstract(foxlite.mesh.FoxQuadFace));
+		set("FoxQuadMesh", foxlite.mesh.FoxQuadMesh);
+
+		#if lime_box3d
+		set("FoxPhysicsBodyType", funkin.utils.MacroUtil.buildAbstract(foxlite.physics.FoxPhysicsBodyType));
+		set("FoxPhysicsWorld", foxlite.physics.FoxPhysicsWorld);
+		#end
+
+		set("TypedArray", foxlite.polyfill.TypedArray);
+		set("VectorFactory", foxlite.polyfill.VectorFactory);
+		
+		set("FoxPostProcess", foxlite.post.FoxPostProcess);
+		
 		set("FoxRenderer", foxlite.renderer.FoxRenderer);
 		set("FoxRenderPass", foxlite.renderer.FoxRenderPass);
+
+		set("FoxArmature", foxlite.skin.FoxArmature);
+		set("FoxBone", foxlite.skin.FoxBone);
+		set("FoxSkinData", foxlite.skin.FoxSkinData);
+
+		set("FoxPanoramaSky", foxlite.sky.FoxPanoramaSky);
+
+		set("FoxStencilAction", foxlite.stencil.FoxStencilAction);
+		set("FoxStencilActionType", funkin.utils.MacroUtil.buildAbstract(foxlite.stencil.FoxStencilActionType));
+		set("FoxStencilCompareMode", funkin.utils.MacroUtil.buildAbstract(foxlite.stencil.FoxStencilCompareMode));
+
+		set("FoxCubemapSide", funkin.utils.MacroUtil.buildAbstract(foxlite.texture.FoxCubemapSide));
+		set("FoxFramebuffer", foxlite.texture.FoxFramebuffer);
+		set("FoxFramebufferCubemap", foxlite.texture.FoxFramebufferCubemap);
+		set("FoxMipFilter", funkin.utils.MacroUtil.buildAbstract(foxlite.texture.FoxMipFilter));
+		set("FoxTexture", foxlite.texture.FoxTexture);
+		set("FoxTextureBuffer", foxlite.texture.FoxTextureBuffer);
+		set("FoxTextureCubemap", foxlite.texture.FoxTextureCubemap);
+		set("FoxTextureFilter", funkin.utils.MacroUtil.buildAbstract(foxlite.texture.FoxTextureFilter));
+		set("FoxWrapMode", funkin.utils.MacroUtil.buildAbstract(foxlite.texture.FoxWrapMode));
 		#end
 		
 		// objects

@@ -370,7 +370,7 @@ class FunkinSprite extends FlxAnimate
 		#end
 	}
 	
-	var _transformedAnimOffset:FlxPoint = FlxPoint.get();
+	public var _transformedAnimOffset:FlxPoint = FlxPoint.get(); // for foxlite shit
 	
 	override function prepareDrawMatrix(matrix:flixel.math.FlxMatrix, camera:FlxCamera):Void
 	{
