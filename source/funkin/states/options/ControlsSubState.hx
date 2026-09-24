@@ -103,7 +103,7 @@ class ControlsSubState extends MusicBeatSubState
 	{
 		super();
 		
-		camera = new FlxCamera();
+		camera = new FunkinCamera();
 		FlxG.cameras.add(camera);
 		
 		camPos = new FlxObject();

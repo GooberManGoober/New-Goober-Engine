@@ -77,7 +77,7 @@ class FunkinAssets
 	/**
 	 * Retrieves the content of a given file from its path
 	 */
-	public static function getContent(key:String, useCache:Bool = true):String
+	public static function getContentUnsafe(key:String, useCache:Bool = true):String
 	{
 		useCache = useCache && !ClientPrefs.inDevMode;
 		
@@ -101,6 +101,17 @@ class FunkinAssets
 		else throw 'Couldnt find file at path [$key]';
 		
 		return ret;
+	}
+	
+	public static function getContent(key:String, useCache:Bool = true):String
+	{
+		final text:String = getContentUnsafe(key, useCache);
+		
+		if (text.length > 0) return text;
+		
+		Logger.log('text ($key) was not found. Returning empty string instead');
+		
+		return '';
 	}
 	
 	/**

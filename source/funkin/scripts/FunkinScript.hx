@@ -247,7 +247,7 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		// set flixel related stuff
 		set("FlxG", flixel.FlxG);
 		set("FlxSprite", flixel.FlxSprite);
-		set("FlxCamera", extensions.flixel.FlxCameraEx);
+		set("FlxCamera", funkin.backend.FunkinCamera);
 		set("FlxMath", flixel.math.FlxMath);
 		set("FlxTimer", flixel.util.FlxTimer);
 		set("FlxTween", flixel.tweens.FlxTween);

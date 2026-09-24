@@ -267,7 +267,7 @@ class OLDChartEditorState extends MusicBeatState
 		// DiscordClient.changePresence("Chart Editor", StringTools.replace(_song.song, '-', ' '));
 		DiscordClient.changePresence("Chart Editor", "Uhm idk mane burp");
 		
-		camHUD = new FlxCamera();
+		camHUD = new FunkinCamera();
 		camHUD.bgColor = 0x0;
 		FlxG.cameras.add(camHUD, false);
 		
