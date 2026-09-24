@@ -8,6 +8,11 @@ class FunkinConstants // use this later and when used add docs to every var
 	
 	public static final STATE_REDIRECT_BLACKLIST:Array<String> = [
 		"ScriptedSubState",
-		"ScriptedState"
+		"ScriptedState",
+		"CharacterEditorState",
+		"ChartEditorState",
+		"MasterEditorMenu",
+		"NoteSkinEditor",
+		"ChartConverterState",
 	];
 }
