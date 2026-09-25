@@ -2,9 +2,9 @@ package funkin.game.shaders;
 
 import flixel.system.FlxAssets.FlxShader;
 
-class AdjustColor
+class AdjustColorShader
 {
-	public var shader(default, null):AdjustColorShader = new AdjustColorShader();
+	public var shader(default, null):AdjustColor = new AdjustColor();
 	public var hue(default, set):Float = 0;
 	public var saturation(default, set):Float = 0;
 	public var brightness(default, set):Float = 0;
@@ -45,17 +45,17 @@ class AdjustColor
 		shader.u_contrast.value[0] = contrast;
 		return contrast;
 	}
-	
-	public function new()
+
+	public function new(_brightness:Float = 0, _hue:Float = 0, _contrast:Float = 0, _saturation:Float = 0)
 	{
-		shader.u_hue.value = [0];
-		shader.u_saturation.value = [0];
-		shader.u_brightness.value = [0];
-		shader.u_contrast.value = [0];
+		shader.u_brightness.value = [_brightness];
+		shader.u_hue.value = [_hue];
+		shader.u_contrast.value = [_contrast];
+		shader.u_saturation.value = [_saturation];
 	}
 }
 
-class AdjustColorShader extends FlxShader
+class AdjustColor extends FlxShader
 {
 	@:glFragmentSource('
 		#pragma header
