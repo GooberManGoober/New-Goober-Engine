@@ -867,7 +867,7 @@ class ChartEditorState extends haxe.ui.backend.flixel.UIState
 		final instVolume:Float = (audio.inst?.volume ?? 1), playerVolume:Float = audio.playerVolume, opponentVolume:Float = audio.opponentVolume;
 		
 		audio.stop();
-		audio.loadSong(song);
+		audio.populate(song);
 		audio.pause();
 		
 		audio.inst.volume = instVolume;

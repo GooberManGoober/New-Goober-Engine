@@ -307,9 +307,25 @@ class FreeplayState extends MusicBeatState
 		
 		if (songs.length > 1)
 		{
+			if(FlxG.keys.justPressed.HOME)
+			{
+				curSelected = 0;
+				changeSelection();
+			}
+			else if(FlxG.keys.justPressed.END)
+			{
+				curSelected = songs.length - 1;
+				changeSelection();	
+			}
 			if (turboDown.PRESSED || turboUp.PRESSED)
 			{
 				changeSelection((controls.UI_UP ? -shiftMult : shiftMult));
+				changeDiff();
+			}
+
+			if(FlxG.mouse.wheel != 0)
+			{
+				changeSelection(-shiftMult * FlxG.mouse.wheel);
 				changeDiff();
 			}
 		}

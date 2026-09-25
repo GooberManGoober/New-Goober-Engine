@@ -958,7 +958,7 @@ class PlayState extends MusicBeatState
 			strums.onNoteHit.add((note, field) -> {
 				if (field.ID == 1 && !camZooming) camZooming = true;
 				
-				if (field.playerControls || (!audio.splitVocals && !audio.trackSwap)) audio.setTrackVolumeState();
+				if (field.playerControls || (!audio.splitVocals && !audio.trackSwap)) audio.hit();
 				
 				if (field.playerControls && field.showRatings && !note.isSustainNote)
 				{
@@ -972,7 +972,7 @@ class PlayState extends MusicBeatState
 			{
 				if (combo > 5 && gf != null && gf.animOffsets.exists('sad')) gf.playAnimForDuration('sad', 1, true);
 				combo = 0;
-				audio.setTrackVolumeState(true);
+				audio.miss();
 				
 				if (instakillOnMiss) doDeathCheck(true);
 				
@@ -1161,7 +1161,7 @@ class PlayState extends MusicBeatState
 		#if FLX_PITCH audio.pitch = playbackRate; #end
 		audio.play();
 		
-		audio.setTrackVolumeState();
+		audio.hit();
 		
 		Conductor.songPosition = time;
 		songTime = time;
@@ -1287,10 +1287,10 @@ class PlayState extends MusicBeatState
 		audio = new PlayableSong();
 		
 		var start = traceCheck ? Sys.time() : 0;
-		audio.loadSong(SONG);
+		audio.populate(SONG);
 		if (traceCheck) trace('loading song took ${Sys.time() - start} seconds');
 		
-		audio.setTrackVolumeState();
+		audio.hit();
 		add(audio);
 		
 		#if FLX_PITCH
@@ -1695,14 +1695,14 @@ class PlayState extends MusicBeatState
 		else DiscordClient.changePresence(rpcDescription, rpcSongName + ' ' + rpcDifficulty, null, true, songLength - Conductor.songPosition - ClientPrefs.noteOffset);
 	}
 	
-	inline function checkResync():Void
+	function checkResync():Void
 	{
-		final MAX_OFFSET:Float = 35 * playbackRate;
-		
+		final maxToleratedOffset:Float = 35 * playbackRate;
+
 		final correctTime = Math.abs(Conductor.songPosition - Conductor.offset);
-		final delta = audio.getDesyncDifference(correctTime);
-		
-		if (delta > MAX_OFFSET) resyncVocals();
+		final songSync = audio.syncVoiceStatus() ? audio.getDesyncDifference(correctTime) : correctTime - audio.inst.time;
+
+		if (songSync > maxToleratedOffset) resyncVocals();
 	}
 	
 	public function resyncVocals():Void
@@ -1714,7 +1714,7 @@ class PlayState extends MusicBeatState
 		audio.pitch = playbackRate;
 		audio.volume = 1 * volumeMult;
 		audio.resync(Conductor.songPosition);
-		audio.setTrackVolumeState();
+		audio.hit();
 		#if FLX_PITCH audio.pitch = playbackRate; #end
 	}
 	
@@ -2789,6 +2789,7 @@ class PlayState extends MusicBeatState
 		
 		audio.volume = 0;
 		audio.stop();
+		audio.stopInst();
 		
 		if (songEndCallback == null)
 		{
@@ -2909,6 +2910,7 @@ class PlayState extends MusicBeatState
 		}
 		
 		audio.stop();
+		audio.stopInst();
 	}
 	
 	public function KillNotes():Void
@@ -3169,7 +3171,7 @@ class PlayState extends MusicBeatState
 	{
 		super.stepHit();
 		
-		if (!startingSong && !endingSong) checkResync();
+		if (audio.inst != null && !endingSong) checkResync();
 		
 		if (curStep == lastStepHit) return;
 		
