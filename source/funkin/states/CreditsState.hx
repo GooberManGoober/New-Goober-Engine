@@ -71,7 +71,6 @@ class CreditsState extends MusicBeatState
 		[''],
 		['Foxlite Credits'],
 		['dwdvIl', '', 'Created the Foxlite 3D renderer', 'https://github.com/dwdvIl', '0xFFFFA500'],
-		['Maxwell cat model', '', 'Model used in the `Maxwell` state', 'https://sketchfab.com/3d-models/maxwell-the-cat-with-bones-animation-4175776146ba4550a8dd643363b7b0aa', '0xFFFFFFFF'],
 		#end
 		// Thanks
 		[''],
