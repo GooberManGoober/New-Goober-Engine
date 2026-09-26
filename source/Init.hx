@@ -6,6 +6,11 @@ import flixel.FlxState;
 import flixel.FlxG;
 import flixel.input.keyboard.FlxKey;
 
+#if FOXLITE_ALLOWED
+import foxlite.renderer.FoxRenderer;
+import foxlite.loaders.FoxLoaderUtil;
+#end
+
 import funkin.backend.math.Vector3;
 
 /**
@@ -69,12 +74,19 @@ class Init extends FlxState
 		
 		funkin.backend.plugins.FullScreenPlugin.init();
 		
+		funkin.backend.plugins.ScreenshotPlugin.init();
+		
 		#if VIDEOS_ALLOWED
 		funkin.video.FunkinVideoSprite.init();
 		#end
 		
 		#if FEATURE_DEBUG_TRACY
 		funkin.utils.WindowUtil.initTracy();
+		#end
+
+		#if FOXLITE_ALLOWED
+        FoxRenderer.initLibs();
+        FoxLoaderUtil.initPathClass(Paths);
 		#end
 		
 		funkin.backend.plugins.ModPlugin.instance.populate();

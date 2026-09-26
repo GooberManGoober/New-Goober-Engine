@@ -127,16 +127,69 @@ class OLDChartEditorState extends MusicBeatState
 			"Value 1: Character to change (Dad, BF, GF)\nValue 2: New character's name"
 		],
 		// my auto formatter is forcing it to be liek this. i will fix it later
-		['Change Noteskin', 'Value 1: name of the noteskin json to change to.\nValue 2: ID of strum to change. (0 -> player, 1 -> opponent, etc)'],
-		['Change Scroll Speed', "Value 1: Scroll Speed Multiplier (1 is default)\nValue 2: Time it takes to change fully in seconds."],
-		['Set Property', "Value 1: Variable name\nValue 2: New value"],
-		['HUD Fade', "Fades the HUD camera\n\nValue 1: Alpha\nValue 2: Duration"],
-		['Camera Fade', "Fades the game camera\n\nValue 1: Alpha\nValue 2: Duration"],
-		['Camera Zoom', "Changes the Camera Zoom.\n\nValue 1: Zoom Multiplier (1 is default)\n\nIn case you want a tween, use Value 2 like this:\n\n\"3, elasticOut\"\n(Duration, Ease Type)"],
-		['Camera Zoom Chain', "Value 1: Camera Zoom Values (0.015, 0.03)\n(also you can add another two values to make it\nzoom screen shake(0.015, 0.03, 0.01, 0.01))\n\nValue 2: Total Amount of Beat Cam Zooms and\nthe space with eachother (4, 1)"],
-		['Screen Shake Chain', "Value 1: Screen Shake Values (0.003, 0.0015)\n\nValue 2: Total Amount of Screen Shake per beat]"], ['Set Cam Zoom', "Value 1: Zoom"],
-		['Set Cam Pos', "Value 1: X\nValue 2: Y"], ["Mult SV", "Changes the notes' scroll velocity via multiplication.\nValue 1: Multiplier"],
-		["Constant SV", "Uses scroll velocity to set the speed to a constant number.\nValue 1: Constant"]];
+		[
+			'Change Noteskin', 
+			'Value 1: name of the noteskin json to change to.\nValue 2: ID of strum to change. (0 -> player, 1 -> opponent, etc)'
+		],
+		[
+			'Change Scroll Speed', 
+			"Value 1: Scroll Speed Multiplier (1 is default)\nValue 2: Time it takes to change fully in seconds."
+		],
+		[
+			'Set Property', 
+			"Value 1: Variable name\nValue 2: New value"
+		],
+		[
+			'HUD Fade', 
+			"Fades the HUD camera\n\nValue 1: Alpha\nValue 2: Duration"
+		],
+		[
+			'Camera Fade', 
+			"Fades the game camera\n\nValue 1: Alpha\nValue 2: Duration"
+		],
+		[
+			'Camera Flash', 
+			"Value 1: Color, Alpha (Optional)\nValue 2: Fade duration"
+		],
+		[
+			'Camera Zoom', 
+			"Changes the Camera Zoom.\n\nValue 1: Zoom Multiplier (1 is default)\n\nIn case you want a tween, use Value 2 like this:\n\n\"3, elasticOut\"\n(Duration, Ease Type)"],
+		[
+			'Camera Zoom Chain', 
+			"Value 1: Camera Zoom Values (0.015, 0.03)\n(also you can add another two values to make it\nzoom screen shake(0.015, 0.03, 0.01, 0.01))\n\nValue 2: Total Amount of Beat Cam Zooms and\nthe space with eachother (4, 1)"],
+		[
+			'Screen Shake Chain', 
+			"Value 1: Screen Shake Values (0.003, 0.0015)\n\nValue 2: Total Amount of Screen Shake per beat]"
+		], 
+		[
+			'Set Cam Zoom', 
+			"Value 1: Zoom"
+		],
+		[
+			'Set Cam Pos', 
+			"Value 1: X\nValue 2: Y"
+		],
+		[
+			"Mult SV", 
+			"Changes the notes' scroll velocity via multiplication.\nValue 1: Multiplier"
+		],
+		[
+			"Constant SV", 
+			"Uses scroll velocity to set the speed to a constant number.\nValue 1: Constant"
+		],
+		[
+			"Focus Camera",
+			"Changes the camera target\n\nValue 1: Target, Time Variant\nValue 2: X, Y, Time, Ease\n\nTarget Options are Player, Opponent, Girlfriend, Position\nTime Options are A (Steps) and B (Seconds), Defaults to A.\n\nX, and Y Values will act an offset if the target isn't 'Position'\n\nTime & Ease will be ignored if the Ease type is either 'Classic' or 'Instant'"
+		],
+		[
+			"Set Camera Bop",
+			"Value 1: Rate of bops per beat\nValue 2: Intensity of each bop"
+		],
+		[
+			"Zoom Camera",
+			"Changes the camera zoom\n\nValue 1: Zoom Type, Time Type\nValue 2: New Zoom Value, Time, Ease.\n\nZoom Types:\n\nAbsolute: Set zoom directly.\nStage: Set zoom as a multiplier of the current stage's default zoom.\n\nTime Options are A (Steps) and B (Seconds), Defaults to A.\n\nTime & Ease will be ignored if the Ease type is 'Instant'"
+		]
+	];
 		
 	public var variables:Map<String, Dynamic> = new Map();
 	
@@ -2437,7 +2490,7 @@ class OLDChartEditorState extends MusicBeatState
 					
 					if (!playedSound[note.lane] && ((playSoundBf.checked && note.mustPress) || (playSoundDad.checked && !note.mustPress)))
 					{
-						FlxG.sound.play(Paths.sound('hitsound')).pan = (note.noteData < (_song.keys * .5) ? -0.3 : 0.3); // would be coolio
+						FlxG.sound.play(Paths.sound('hitsound-${ClientPrefs.hitsoundType}')).pan = (note.noteData < (_song.keys * .5) ? -0.3 : 0.3); // would be coolio
 						playedSound[note.lane] = true;
 					}
 				}
@@ -3147,6 +3200,9 @@ class OLDChartEditorState extends MusicBeatState
 		
 		leftIcon.y = (-leftIcon.height);
 		rightIcon.y = (-rightIcon.height);
+
+		leftIcon.frameCount = CharacterParser.fetchInfo(_song.player1).icon_count;
+		rightIcon.frameCount = CharacterParser.fetchInfo(_song.player2).icon_count;
 		
 		var focusedIcon:HealthIcon = (mustHit ? leftIcon : rightIcon);
 		

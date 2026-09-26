@@ -17,12 +17,16 @@ class MasterEditorMenu extends MusicBeatState
 		'Chart Editor',
 		'Character Editor',
 		'Note Skin Editor',
+		'Modchart Editor (Unfinished)',
 		'Chart Converter',
-		"Metadata Editor",
+		'Metadata Editor',
 		'Mods Manager',
 		'Week Editor',
 		'Menu Character Editor',
 		'New Chart Editor (Unfinished)',
+		#if FOXLITE_ALLOWED
+		'Maxwell',
+		#end
 	];
 	private var grpTexts:FlxTypedGroup<Alphabet>;
 	private var directories:Array<String> = [null];
@@ -120,25 +124,31 @@ class MasterEditorMenu extends MusicBeatState
 			var muteMusic:Bool = true;
 			switch (options[curSelected])
 			{
-				case 'Mods Manager':
-					FlxG.switchState(() -> new ModsState());
-				case 'Character Editor':
-					FlxG.switchState(() -> new CharacterEditorState(Character.DEFAULT_CHARACTER, false));
-				case 'Week Editor':
-					FlxG.switchState(() -> new WeekEditorState());
-				case 'Metadata Editor':
-					openSubState(new SongMetaEditor());
-					muteMusic = false;
-				case 'Menu Character Editor':
-					FlxG.switchState(() -> new MenuCharacterEditorState());
 				case 'Chart Editor': // felt it would be cool maybe
 					FlxG.switchState(OLDChartEditorState.new);
+				case 'Character Editor':
+					FlxG.switchState(() -> new CharacterEditorState(Character.DEFAULT_CHARACTER, false));
 				// case 'Note Skin Editor':
-				// 	FlxG.switchState(() -> new NoteSkinEditor('default'));
+					// 	FlxG.switchState(() -> new NoteSkinEditor('default'));
+				case 'Modchart Editor (Unfinished)':
+					FlxG.switchState(() -> new ModchartEditorState());
 				case 'Chart Converter':
 					FlxG.switchState(() -> new ChartConverterState());
+				case 'Metadata Editor':
+					openSubState(new SongMetaEditor());
+					persistentUpdate = false; // makes it so you can't scroll through the options while in this substate
+				case 'Mods Manager':
+					FlxG.switchState(() -> new ModsState());
+				case 'Week Editor':
+					FlxG.switchState(() -> new WeekEditorState());
+				case 'Menu Character Editor':
+					FlxG.switchState(() -> new MenuCharacterEditorState());
 				case "New Chart Editor (Unfinished)":
 					FlxG.switchState(ChartEditorState.new);
+				#if FOXLITE_ALLOWED
+				case "Maxwell":
+					FlxG.switchState(MaxwellState.new);
+				#end
 			}
 			if (muteMusic)
 			{

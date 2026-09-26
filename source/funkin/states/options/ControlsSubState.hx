@@ -69,6 +69,7 @@ class ControlsSubState extends MusicBeatSubState
 		];
 		
 		WINDOW_GROUP = [
+			{label: "Screenshot", action: SCREENSHOT},
 			{label: "Fullscreen", action: FULLSCREEN},
 			null,
 		];
@@ -81,8 +82,8 @@ class ControlsSubState extends MusicBeatSubState
 		];
 		
 		DEBUG_GROUP = [
-			{label: "Key 1", action: "debug_1"},
-			{label: "Key 2", action: "debug_2"},
+			{label: "Chart", action: "debug_1"},
+			{label: "Char", action: "debug_2"},
 			{label: "Debug Display", action: SWITCH_DEBUG_DISPLAY},
 			{label: "Soft Reload", action: SOFT_RELOAD},
 			{label: "Hard Reload", action: HARD_RELOAD},
@@ -458,7 +459,6 @@ class ControlsOption extends FlxSpriteContainer
 		super(x, y);
 		this.label = new Alphabet(0, 0, label, true);
 		add(this.label);
-		
 		binds = new FlxTypedSpriteContainer<Alphabet>(700, -55);
 		add(binds);
 		

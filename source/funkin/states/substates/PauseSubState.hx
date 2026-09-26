@@ -113,7 +113,7 @@ class PauseSubState extends MusicBeatSubState
 			return t;
 		}
 		
-		var levelInfo = createCornerText(PlayState.SONG.song);
+		var levelInfo = createCornerText((PlayState.meta != null) ? PlayState.meta.displayName : PlayState.SONG.song);
 		add(levelInfo);
 		
 		var levelDifficulty = createCornerText(Difficulty.getCurrentDifficultyString());

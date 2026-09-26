@@ -14,12 +14,13 @@ Havee fun with NightmareVision V1! (***[follow me on twitter](https://twitter.co
 
 * Cne Crew for their EventMacro [Codename Engine](https://github.com/CodenameCrew/CodenameEngine)
 
-* Rozebud for the chart editor little buddies ([Check out their engine too](https://github.com/ThatRozebudDude/FPS-Plus-Public))
+* Rozebud for the chart editor little buddies, and the overhauled camera system ([Check out their engine too](https://github.com/ThatRozebudDude/FPS-Plus-Public))
 
 * FunkinCrew for their [Lime](https://github.com/FunkinCrew/lime), [Openfl](https://github.com/FunkinCrew/openfl), [Hxcpp](https://github.com/FunkinCrew/hxcpp) forks
 
 * MaybeMaru for [MoonChart](https://github.com/MaybeMaru/moonchart) and [Flixel-Animate](https://github.com/MaybeMaru/flixel-animate)
 
+* dwdvIl for [Foxlite](https://github.com/dwdvIl/foxlite)
 
 # How to compile NMV Engine
 

@@ -21,6 +21,7 @@ class FunkinSoundTray extends FlxSoundTray
 	var graphicScale:Float = 0.30;
 	var lerpYPos:Float = 0;
 	var alphaTarget:Float = 0;
+	var keepSoundTrayOnScreen:Bool = false;
 	
 	var volumeMaxSound:FlxSoundAsset;
 	
@@ -80,6 +81,7 @@ class FunkinSoundTray extends FlxSoundTray
 	{
 		y = MathUtil.fpsLerp(y, lerpYPos, 0.1);
 		alpha = MathUtil.fpsLerp(alpha, alphaTarget, 0.25);
+		keepSoundTrayOnScreen =  FlxG.sound.volume > 0.1 && !FlxG.sound.muted;
 		
 		// Animate sound tray thing
 		if (_timer > 0)
@@ -87,7 +89,7 @@ class FunkinSoundTray extends FlxSoundTray
 			_timer -= (MS / 1000);
 			alphaTarget = 1;
 		}
-		else if (y >= -height)
+		else if (y >= -height && keepSoundTrayOnScreen)
 		{
 			lerpYPos = -height - 10;
 			alphaTarget = 0;

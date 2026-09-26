@@ -114,6 +114,10 @@
 
                         <label text="Health Bar Colour" verticalAlign="center" horizontalAlign="center" />
                         <color-picker-popup id="healthColourPicker"  verticalAlign="center" horizontalAlign="center" />
+
+                        <label text="Icon Frames:" verticalAlign="center" horizontalAlign="center"/>
+                        <number-stepper pos="2" step="1" id="iconFrameStepper" min="1" precision="0" tooltip='How many frames your icon has.'/>
+                        
                     </vbox>
 
 

@@ -5,6 +5,7 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 
 import funkin.backend.DebugDisplay;
+import funkin.utils.WindowUtil;
 
 class GraphicsSettingsSubState extends BaseOptionsMenu
 {
@@ -31,12 +32,12 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 		option.onChange = onChangeAntiAliasing; // Changing onChange is only needed if you want to make a special interaction after it changes the value
 		addOption(option);
 		
-		var option:Option = new Option('Debug Display Type',
+		var option:Option = new Option('Debug Display Type:',
 			'Handles what type of information to display in the top left of your screen.\nSimple displays FPS & Memory, and advanced displays the same alongside debug information.\nDisabled disables the counter entirely.',
 			'fpsDisplayType', STRING, 'Simple', ['Simple', 'Advanced', 'Disabled']);
 		addOption(option);
 		
-		var option:Option = new Option('Framerate', "Pretty self explanatory, isn't it?", 'framerate', INT, 60);
+		var option:Option = new Option('Framerate:', "Pretty self explanatory, isn't it?", 'framerate', INT, 60);
 		addOption(option);
 		
 		option.minValue = 60;

@@ -66,6 +66,13 @@ class CreditsState extends MusicBeatState
 		["crowplexus", "crowplexus", "Creator of HScript-Iris and various PR's", "https://twitter.com/crowplexus", "0xCFCFCF"],
 		['MAJigsaw77', 'majigsaw', 'Creator of Hxvlc', 'https://x.com/MAJigsaw77', '0x6E6E6E'],
 		['maybeMaru', '', 'Creator of Moonchart and Flixel-Animate', 'https://x.com/maybemaru_', '0x4D5DBD'],
+		#if FOXLITE_ALLOWED
+		// Foxlite
+		[''],
+		['Foxlite Credits'],
+		['dwdvIl', '', 'Created the Foxlite 3D renderer', 'https://github.com/dwdvIl', '0xFFFFA500'],
+		['Maxwell cat model', '', 'Model used in the `Maxwell` state', 'https://sketchfab.com/3d-models/maxwell-the-cat-with-bones-animation-4175776146ba4550a8dd643363b7b0aa', '0xFFFFFFFF'],
+		#end
 		// Thanks
 		[''],
 		['Special Thanks'],

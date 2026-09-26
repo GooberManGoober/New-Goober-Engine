@@ -44,6 +44,10 @@ class ClientPrefs
 	
 	@saveVar public static var autoPause:Bool = true;
 	
+	@saveVar public static var fancyPreview:Bool = true;
+	
+	@saveVar public static var previewOnSave:Bool = true;
+	
 	// graphics ------------------------------------------------------------------------//
 	@saveVar public static var gpuCaching:Bool = true;
 	
@@ -98,6 +102,8 @@ class ClientPrefs
 	@saveVar public static var noReset:Bool = false;
 	
 	@saveVar public static var hitsoundVolume:Float = 0;
+	
+	@saveVar public static var hitsoundType:String = "NMV";
 	
 	@saveVar public static var ratingOffset:Int = 0;
 	
@@ -210,6 +216,7 @@ class ClientPrefs
 		'pause' => [ENTER, ESCAPE],
 		'reset' => [R, NONE],
 		'fullscreen' => [F11, NONE],
+		'screenshot' => [F2, NONE],
 		'volume_mute' => [ZERO, NONE],
 		'volume_up' => [NUMPADPLUS, PLUS],
 		'volume_down' => [NUMPADMINUS, MINUS],
