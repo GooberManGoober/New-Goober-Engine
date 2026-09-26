@@ -431,6 +431,7 @@ class FreeplayState extends MusicBeatState
 			}
 			else
 			{
+				PlayState.chartingMode = false;
 				FlxG.switchState(PlayState.new);
 			}
 			
